@@ -930,60 +930,99 @@ const Art = {
   },
 
   drawShawarmaKioskBack(ctx, x, y) {
-    // Door opening on RIGHT side (x+56 to x+84). Spit on LEFT side of interior.
+    // Interior layer. Door opening left (x to x+30). Window gap in front reveals interior.
     ctx.save();
     ctx.imageSmoothingEnabled = false;
-    const kW = 84, kH = 102;
+    const kW = 168, kH = 102;
 
     // Rear wall
     ctx.fillStyle = '#333';
     ctx.fillRect(x, y - kH, kW, kH);
-    // Interior bright back wall
-    ctx.fillStyle = '#ccc';
-    ctx.fillRect(x + 4, y - kH + 4, kW - 8, kH - 40);
+    // Interior bright back wall (full width — visible through door + window)
+    ctx.fillStyle = '#d0d0d0';
+    ctx.fillRect(x + 4, y - kH + 4, kW - 8, kH - 42);
     // Interior floor/counter base
     ctx.fillStyle = '#888';
     ctx.fillRect(x + 4, y - 38, kW - 8, 8);
     ctx.fillStyle = '#aaa';
     ctx.fillRect(x + 4, y - 30, kW - 8, 30);
 
-    // Shawarma spit pole (left side of interior, visible as player exits right)
+    // Shawarma spit pole — centered in the window opening (window x+38..x+116, center x+77)
     ctx.fillStyle = '#555';
-    ctx.fillRect(x + 22, y - kH + 8, 4, 66);
-    // Spit cap
+    ctx.fillRect(x + 74, y - kH + 8, 4, 66);  // pole
     ctx.fillStyle = '#000';
-    ctx.fillRect(x + 20, y - kH + 6, 8, 4);
+    ctx.fillRect(x + 72, y - kH + 6, 8, 4);   // cap
 
-    // Shawarma meat stack (tapers toward top)
-    const meatWidths = [22, 20, 18, 16, 14, 12, 10];
+    // Meat stack tapered toward top, centered on spit (x+76)
+    const meatWidths = [28, 26, 24, 22, 20, 18, 14];
     for (let i = 0; i < meatWidths.length; i++) {
       const mw = meatWidths[i];
-      const mx = x + 24 - Math.floor(mw / 2);
+      const mx = x + 76 - Math.floor(mw / 2);
       const my = y - kH + 14 + i * 8;
-      ctx.fillStyle = i % 2 === 0 ? '#444' : '#666';
+      ctx.fillStyle = i % 2 === 0 ? '#5a3a2a' : '#7a5040';
       ctx.fillRect(mx, my, mw, 7);
-      ctx.fillStyle = '#222';
+      ctx.fillStyle = '#2a1a10';
       ctx.fillRect(mx, my, mw, 1);
+      // Shiny edge
+      ctx.fillStyle = '#c87040';
+      ctx.fillRect(mx, my + 2, 3, 3);
     }
 
     ctx.restore();
   },
 
   drawShawarmaKioskFront(ctx, x, y) {
-    // Door opening on LEFT (x to x+doorEnd). Front wall on RIGHT (x+doorEnd to x+kW).
+    // Front layer drawn on top of player. Door opening x..x+30. Window gap x+38..x+116.
     ctx.save();
     ctx.imageSmoothingEnabled = false;
-    const kW = 84, kH = 102;
-    const doorEnd = 30; // door spans x+0 to x+doorEnd; wall covers x+doorEnd to x+kW
+    const kW = 168, kH = 102;
+    const doorEnd = 30;
 
-    // Right front wall (hides player while they're inside)
+    // Window opening boundaries (back layer shows through this gap)
+    const WX = x + 38, WY = y - kH + 28, WW = 78, WH = 36;
+
+    // Front wall drawn in 4 pieces — skipping the window gap
     ctx.fillStyle = '#222';
-    ctx.fillRect(x + doorEnd, y - kH, kW - doorEnd, kH);
-    // Interior texture on right wall
-    ctx.fillStyle = '#888';
-    ctx.fillRect(x + doorEnd + 4, y - kH + 4, kW - doorEnd - 8, kH - 44);
+    ctx.fillRect(x + doorEnd, y - kH, kW - doorEnd, WY - (y - kH));   // top strip (sign area)
+    ctx.fillRect(x + doorEnd, WY, WX - (x + doorEnd), WH);             // left of window
+    ctx.fillRect(WX + WW, WY, (x + kW) - (WX + WW), WH);              // right of window
+    ctx.fillRect(x + doorEnd, WY + WH, kW - doorEnd, y - (WY + WH));   // bottom (counter)
 
-    // Counter front (right section only)
+    // ── Big sign across the full top strip ───────────────────────────────────
+    const signX = x + doorEnd + 4;
+    const signW = kW - doorEnd - 8;                // ~134px
+    const signTop = y - kH + 4;
+    const signH = WY - (y - kH) - 8;              // fills the top strip minus margin
+    ctx.fillStyle = '#111';
+    ctx.fillRect(signX, signTop, signW, signH);    // outer border
+    ctx.fillStyle = '#e84800';
+    ctx.fillRect(signX + 2, signTop + 2, signW - 4, signH - 4); // orange bg
+    // Highlight stripe at top of sign
+    ctx.fillStyle = '#ff7030';
+    ctx.fillRect(signX + 2, signTop + 2, signW - 4, 3);
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 13px monospace';
+    ctx.direction = 'rtl';
+    ctx.textAlign = 'center';
+    ctx.fillText('שאווארמה פיצוץ', x + doorEnd + signW / 2 + 4, signTop + signH - 5);
+    ctx.direction = 'ltr';
+    ctx.textAlign = 'left';
+
+    // ── Window frame ─────────────────────────────────────────────────────────
+    ctx.fillStyle = '#111';
+    ctx.fillRect(WX - 3, WY - 3, WW + 6, 4);         // top frame
+    ctx.fillRect(WX - 3, WY + WH, WW + 6, 4);         // bottom frame
+    ctx.fillRect(WX - 3, WY - 3, 4, WH + 6);          // left frame
+    ctx.fillRect(WX + WW - 1, WY - 3, 4, WH + 6);     // right frame
+    // Dividing bars (grid pattern)
+    ctx.fillRect(WX, WY + Math.floor(WH / 2), WW, 2); // horizontal
+    ctx.fillRect(WX + Math.floor(WW / 2), WY, 2, WH); // vertical
+    // Glass glint
+    ctx.fillStyle = '#e8f0f8';
+    ctx.fillRect(WX + 3, WY + 3, WW / 2 - 6, 2);
+    ctx.fillRect(WX + 3, WY + 6, 2, WH / 2 - 6);
+
+    // ── Counter front ────────────────────────────────────────────────────────
     ctx.fillStyle = '#000';
     ctx.fillRect(x + doorEnd, y - 38, kW - doorEnd, 38);
     ctx.fillStyle = '#555';
@@ -992,38 +1031,21 @@ const Art = {
     ctx.fillStyle = '#333';
     ctx.fillRect(x + doorEnd - 2, y - 40, kW - doorEnd + 4, 4);
 
-    // Sign on right wall — Hebrew: שאווארמה פיצוץ (two lines)
+    // ── Posts ────────────────────────────────────────────────────────────────
     ctx.fillStyle = '#000';
-    ctx.fillRect(x + doorEnd + 4, y - kH + 8, kW - doorEnd - 8, 26);
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(x + doorEnd + 6, y - kH + 10, kW - doorEnd - 12, 22);
-    ctx.fillStyle = '#000';
-    ctx.font = 'bold 8px monospace';
-    ctx.direction = 'rtl';
-    ctx.textAlign = 'right';
-    ctx.fillText('שאווארמה', x + kW - 7, y - kH + 20);
-    ctx.fillText('פיצוץ', x + kW - 7, y - kH + 30);
-    ctx.direction = 'ltr';
-    ctx.textAlign = 'left';
+    ctx.fillRect(x - 2,            y - kH, 6, kH + 2);  // left
+    ctx.fillRect(x + doorEnd - 2,  y - kH, 6, kH + 2);  // door-wall divider
+    ctx.fillRect(x + kW - 2,       y - kH, 6, kH + 2);  // right
 
-    // Left post (door frame left)
-    ctx.fillStyle = '#000';
-    ctx.fillRect(x - 2, y - kH, 6, kH + 2);
-    // Door frame right post (between door and wall)
-    ctx.fillRect(x + doorEnd - 2, y - kH, 6, kH + 2);
-    // Right post
-    ctx.fillRect(x + kW - 2, y - kH, 6, kH + 2);
-
-    // Striped awning (full width, drawn last so it's on top)
+    // ── Striped awning (full width) ──────────────────────────────────────────
     const awW = kW + 12, awH = 14, awX = x - 6, awY = y - kH - 10;
     ctx.fillStyle = '#000';
     ctx.fillRect(awX, awY, awW, awH);
-    const stripeW = Math.floor(awW / 7);
-    for (let i = 0; i < 7; i += 2) {
+    const stripeW = 13;
+    for (let i = 0; i * stripeW < awW; i += 2) {
       ctx.fillStyle = '#fff';
       ctx.fillRect(awX + i * stripeW + 1, awY + 2, stripeW - 1, awH - 4);
     }
-    // Awning fringe
     for (let fi = 0; fi < awW; fi += 8) {
       ctx.fillStyle = '#000';
       ctx.fillRect(awX + fi, awY + awH, 4, 5);
@@ -1487,7 +1509,7 @@ class Game {
     this.obstacles = [];
     this.shelter = new ShelterDoor();
     this.player.reset();
-    this.kioskScreenX = Math.round(W / 2) - 42;  // kiosk centered on screen
+    this.kioskScreenX = Math.round(W / 2) - 84;  // kiosk centered on screen (kW/2=84)
     this.player.x = this.kioskScreenX + 55;      // player starts inside (right of door)
     this.introZoom = 2.0;                         // zoom starts at 200%, pulls back to 100%
     this.kioskVisible = true;
@@ -1584,7 +1606,7 @@ class Game {
 
     if (this.kioskVisible) {
       this.kioskScreenX -= this.speed * 0.5 * dt;  // scroll with mid-layer
-      if (this.kioskScreenX + 90 < 0) this.kioskVisible = false;
+      if (this.kioskScreenX + 174 < 0) this.kioskVisible = false;
     }
     this.background.update(dt, this.speed);
     this.player.update(dt);
@@ -1692,7 +1714,7 @@ class Game {
     if (this.levelIntro) {
       // Zoom entire scene (background + midground + kiosk + player) 2x → 1x
       const zoom = this.introZoom;
-      const zCX = this.kioskScreenX + 42;  // kiosk center x
+      const zCX = this.kioskScreenX + 84;  // kiosk center x (kW/2)
       const zCY = GROUND_Y - 50;           // kiosk center y
       ctx.save();
       ctx.translate(zCX, zCY);
