@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "Shelter Run: Tel Aviv",
+  "version": "1.0",
+  "description": "8-bit B&W runner game — reach the shelter before time runs out!",
+  "action": {
+    "default_title": "Play Shelter Run"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}
