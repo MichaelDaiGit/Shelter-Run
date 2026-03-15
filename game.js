@@ -43,8 +43,8 @@ const Art = {
       ctx.fillRect(-8, -4, 7, 8);
       ctx.fillRect(2, -4, 7, 8);
     } else {
-      // Upper-body bob: rises on mid-stride frames, neutral on contact frames
-      const bob = state === 'run' ? [0, -2, 0, -2][frame % 4] : 0;
+      // Upper-body bob: dips down on contact frames, returns to neutral on mid-stride
+      const bob = state === 'run' ? [2, 0, 2, 0][frame % 4] : 0;
       ctx.save();
       ctx.translate(0, bob);
       // head
