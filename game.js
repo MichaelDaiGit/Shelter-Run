@@ -382,36 +382,83 @@ const Art = {
   },
 
   drawDrone(ctx, x, y, frame) {
+    // Side-view DJI Mavic-style quadcopter
     ctx.save();
     ctx.translate(x, y);
+    ctx.scale(0.8, 0.8);
     ctx.imageSmoothingEnabled = false;
-    ctx.fillStyle = '#000';
-    ctx.fillRect(-32, -2, 64, 4);
-    ctx.fillRect(-2, -22, 4, 44);
-    ctx.fillRect(-36, -6, 8, 8);
-    ctx.fillRect(28,  -6, 8, 8);
-    ctx.fillRect(-6, -26, 8, 8);
-    ctx.fillRect(-6,  18, 8, 8);
-    const propA = frame === 0 ? 12 : 5;
-    ctx.fillStyle = '#555';
-    ctx.fillRect(-32 - propA, -4, propA * 2, 3);
-    ctx.fillRect( 32 - propA, -4, propA * 2, 3);
-    ctx.fillRect(-4, -22 - propA, 3, propA * 2);
-    ctx.fillRect(-4,  22 - propA, 3, propA * 2);
-    ctx.fillStyle = '#000';
-    ctx.fillRect(-10, -8, 20, 16);
-    ctx.fillStyle = '#aaa';
-    ctx.fillRect(-8, -6, 16, 12);
-    ctx.fillStyle = '#000';
-    ctx.fillRect(-5, 8, 10, 8);
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(-4, 9, 8, 5);
-    ctx.fillStyle = '#000';
-    ctx.fillRect(-2, 10, 4, 3);
-    if (frame === 0) {
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(-3, -12, 6, 4);
+
+    const spin = frame % 2 === 0;
+
+    // ── Rotor blur discs (faint, behind everything) ──
+    ctx.fillStyle = 'rgba(160,160,160,0.10)';
+    ctx.fillRect(-46, -16, 26, 8);   // left disc
+    ctx.fillRect(20,  -16, 26, 8);   // right disc
+
+    // ── Horizontal arm booms ──
+    ctx.fillStyle = '#383838';
+    ctx.fillRect(-36, -8, 72, 5);    // full-width boom
+
+    // ── Motor pods at arm tips ──
+    ctx.fillStyle = '#222';
+    ctx.fillRect(-38, -11, 10, 10);  // left pod
+    ctx.fillRect(28,  -11, 10, 10);  // right pod
+    ctx.fillStyle = '#484848';
+    ctx.fillRect(-36, -10, 6, 5);    // left pod top sheen
+    ctx.fillRect(30,  -10, 6, 5);    // right pod top sheen
+
+    // ── Rotor blades (animated) ──
+    if (spin) {
+      // Full horizontal span visible
+      ctx.fillStyle = '#777';
+      ctx.fillRect(-50, -13, 24, 3); // left blade pair
+      ctx.fillRect(26,  -13, 24, 3); // right blade pair
+    } else {
+      // Blades rotated 45° — appear as shorter thicker bar
+      ctx.fillStyle = '#666';
+      ctx.fillRect(-46, -15, 16, 7); // left
+      ctx.fillRect(30,  -15, 16, 7); // right
     }
+
+    // ── Main body shell ──
+    ctx.fillStyle = '#1c1c1c';
+    ctx.fillRect(-12, -8, 24, 18);   // body
+
+    // Top panel / seam
+    ctx.fillStyle = '#2c2c2c';
+    ctx.fillRect(-10, -6, 20, 8);
+    ctx.fillStyle = '#404040';
+    ctx.fillRect(-10, -6, 20, 2);    // highlight edge
+
+    // Battery latch area
+    ctx.fillStyle = '#282828';
+    ctx.fillRect(-6, 0, 12, 5);
+    ctx.fillStyle = '#363636';
+    ctx.fillRect(-5, 1, 10, 3);
+
+    // ── Camera gimbal (hangs below front of body) ──
+    ctx.fillStyle = '#111';
+    ctx.fillRect(-7, 10, 11, 9);     // gimbal housing
+    ctx.fillStyle = '#555';
+    ctx.fillRect(-5, 11, 7, 7);      // camera body
+    ctx.fillStyle = '#888';
+    ctx.fillRect(-4, 12, 5, 5);      // lens outer
+    ctx.fillStyle = '#bbb';
+    ctx.fillRect(-3, 13, 3, 3);      // lens inner
+    ctx.fillStyle = '#ddd';
+    ctx.fillRect(-2, 13, 2, 2);      // lens highlight
+
+    // ── Landing gear ──
+    ctx.fillStyle = '#2a2a2a';
+    ctx.fillRect(-8, 19, 3, 6);      // left strut
+    ctx.fillRect(5,  19, 3, 6);      // right strut
+    ctx.fillRect(-11, 24, 8, 2);     // left skid
+    ctx.fillRect(4,   24, 8, 2);     // right skid
+
+    // ── Status LED (blinks green) ──
+    ctx.fillStyle = frame % 4 < 2 ? '#00ee00' : '#004400';
+    ctx.fillRect(7, 3, 3, 3);
+
     ctx.restore();
   },
 
@@ -823,108 +870,130 @@ const Art = {
   },
 
   drawAmbulance(ctx, x, y, flashOn) {
-    // GMC Savana Type-II ambulance — 150px wide, faces right (cab on right)
-    // x = left edge, y = GROUND_Y
+    // MDA Israeli ambulance — yellow Sprinter-style van, 150px wide
+    // Faces right (rear on left, front/cab on right). x = left edge, y = GROUND_Y
     ctx.save();
     ctx.translate(x, y);
     ctx.imageSmoothingEnabled = false;
 
-    // ── Wheels ──────────────────────────────────────────────────────────
-    // Rear dual wheels
-    ctx.fillStyle = '#000';
-    ctx.fillRect(8,   -18, 44, 18);
-    ctx.fillStyle = '#222';
-    ctx.fillRect(12,  -16, 36, 14);
-    ctx.fillStyle = '#888';
-    ctx.fillRect(14,  -14, 14, 10);  // inner hub
-    ctx.fillRect(32,  -14, 14, 10);  // outer hub
-    ctx.fillStyle = '#000';
-    ctx.fillRect(29,  -16,  3, 14);  // dual-wheel center divide
-    // Front wheel
-    ctx.fillStyle = '#000';
-    ctx.fillRect(110, -18, 30, 18);
-    ctx.fillStyle = '#222';
-    ctx.fillRect(113, -16, 24, 14);
-    ctx.fillStyle = '#888';
-    ctx.fillRect(116, -14, 18, 10);
+    const YEL = '#f2c200';  // MDA bright yellow
+    const YDK = '#c9a000';  // darker yellow panel lines
+    const RED = '#cc0000';  // MDA red
 
-    // ── Box body ─────────────────────────────────────────────────────────
-    ctx.fillStyle = '#eee';
-    ctx.fillRect(0,   -68, 122, 60);
-
-    // ── Cab (GMC boxy front, blends with body) ────────────────────────────
-    ctx.fillStyle = '#ddd';
-    ctx.fillRect(118, -70,  32, 62);
-
-    // Windshield — tall, full-width, dark glass
-    ctx.fillStyle = '#777';
-    ctx.fillRect(122, -68,  24, 40);
-    ctx.fillStyle = '#999';
-    ctx.fillRect(124, -66,  20, 36);
-    // Wiper park line
-    ctx.fillStyle = '#777';
-    ctx.fillRect(122, -46,  24,  2);
-
-    // Rear side window
-    ctx.fillStyle = '#888';
-    ctx.fillRect(2,   -64,  22, 20);
-    ctx.fillStyle = '#999';
-    ctx.fillRect(3,   -63,  20, 18);
-
-    // ── Outlines ──────────────────────────────────────────────────────────
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0,   -68, 122,  2);  // body top
-    ctx.fillRect(0,   -68,   2, 60);  // body rear edge
-    ctx.fillRect(0,    -8, 150,  2);  // undercarriage
-    ctx.fillRect(118, -70,   2, 62);  // body/cab seam
-    ctx.fillRect(118, -70,  32,  2);  // cab top
-    ctx.fillRect(148, -70,   2, 62);  // cab front edge
-    // Rear door panel lines
-    ctx.fillStyle = '#ccc';
-    ctx.fillRect(2,   -66,   1, 56);  // vertical seam
-    ctx.fillRect(2,   -40,  28,  1);  // horizontal mid bar
-
-    // ── Red MDA side stripe ───────────────────────────────────────────────
-    ctx.fillStyle = '#d00';
-    ctx.fillRect(0,   -36, 150,  7);
-
-    // ── Star of David (Magen David) — red, pixel-art hexagram ─────────────
-    // u=4px unit; 9 rows tall (36px total), 7u wide (28px)
-    // Centered at scx=58, scy=-50 (upper body, above stripe)
-    const u = 4, scx = 58, scy = -50;
-    ctx.fillStyle = '#f00';
-    ctx.fillRect(scx - 2,  scy - 16,  4, u);   // row 0: top spike
-    ctx.fillRect(scx - 6,  scy - 12, 12, u);   // row 1: 3u
-    ctx.fillRect(scx - 10, scy -  8, 20, u);   // row 2: 5u
-    ctx.fillRect(scx - 14, scy -  4,  8, u);   // row 3: left side spike
-    ctx.fillRect(scx +  6, scy -  4,  8, u);   // row 3: right side spike
-    ctx.fillRect(scx - 14, scy,      28, u);   // row 4: full width 7u
-    ctx.fillRect(scx - 14, scy +  4,  8, u);   // row 5: left side spike
-    ctx.fillRect(scx +  6, scy +  4,  8, u);   // row 5: right side spike
-    ctx.fillRect(scx - 10, scy +  8, 20, u);   // row 6: 5u
-    ctx.fillRect(scx -  6, scy + 12, 12, u);   // row 7: 3u
-    ctx.fillRect(scx -  2, scy + 16,  4, u);   // row 8: bottom spike
-
-    // ── Full-width light bar on roof ──────────────────────────────────────
-    ctx.fillStyle = '#222';
-    ctx.fillRect(10, -82, 128, 14);  // bar housing
+    // ── Rear wheel ───────────────────────────────────────────────────────
     ctx.fillStyle = '#111';
-    ctx.fillRect(10, -84, 128,  4);  // top bracket
-    // Blue lamps (Israeli emergency lights — left two cells)
-    ctx.fillStyle = flashOn ? '#66f' : '#228';
-    ctx.fillRect(12, -80,  30, 10);
-    ctx.fillRect(44, -80,  30, 10);
-    // Red lamps (right two cells — alternate flash)
-    ctx.fillStyle = flashOn ? '#811' : '#f33';
-    ctx.fillRect(76, -80,  30, 10);
-    ctx.fillRect(108,-80,  28, 10);
-    // Cell dividers
-    ctx.fillStyle = '#000';
-    ctx.fillRect(42, -80,   2, 10);
-    ctx.fillRect(74, -80,   2, 10);
-    ctx.fillRect(106,-80,   2, 10);
-    ctx.fillRect(12, -80, 126,  1);  // top lens line
-    ctx.fillRect(12, -71, 126,  1);  // bottom lens line
+    ctx.fillRect(10, -22, 36, 22);
+    ctx.fillStyle = '#2a2a2a';
+    ctx.fillRect(14, -20, 28, 18);
+    ctx.fillStyle = '#888';
+    ctx.fillRect(18, -18, 20, 14);   // hub face
+    ctx.fillStyle = '#555';
+    ctx.fillRect(20, -16, 4, 10);    // spoke L
+    ctx.fillRect(28, -16, 4, 10);    // spoke R
+    ctx.fillRect(24, -16, 4, 3);     // spoke T
+    ctx.fillRect(24, -9,  4, 3);     // spoke B
+    ctx.fillStyle = '#333';
+    ctx.fillRect(24, -14, 6, 6);     // center cap
+
+    // ── Front wheel ──────────────────────────────────────────────────────
+    ctx.fillStyle = '#111';
+    ctx.fillRect(108, -22, 34, 22);
+    ctx.fillStyle = '#2a2a2a';
+    ctx.fillRect(112, -20, 26, 18);
+    ctx.fillStyle = '#888';
+    ctx.fillRect(116, -18, 18, 14);
+    ctx.fillStyle = '#555';
+    ctx.fillRect(118, -16, 4, 10);
+    ctx.fillRect(126, -16, 4, 10);
+    ctx.fillRect(122, -16, 4, 3);
+    ctx.fillRect(122, -9,  4, 3);
+    ctx.fillStyle = '#333';
+    ctx.fillRect(122, -14, 4, 6);
+
+    // ── Undercarriage / bumpers ───────────────────────────────────────────
+    ctx.fillStyle = '#222';
+    ctx.fillRect(0,   -22, 150, 4);  // sill
+    ctx.fillRect(0,   -14,  10, 14); // rear bumper
+    ctx.fillRect(140, -14,  10, 14); // front bumper
+
+    // ── Box body (yellow) ────────────────────────────────────────────────
+    ctx.fillStyle = YEL;
+    ctx.fillRect(0, -84, 106, 62);
+
+    // ── Cab (yellow, tall roofline same as body) ──────────────────────────
+    ctx.fillStyle = YEL;
+    ctx.fillRect(104, -84, 46, 62);
+
+    // ── Rear side window ─────────────────────────────────────────────────
+    ctx.fillStyle = '#222';
+    ctx.fillRect(2, -80, 26, 2);     // top frame
+    ctx.fillRect(2, -80, 2, 22);     // left frame
+    ctx.fillRect(26, -80, 2, 22);    // right frame
+    ctx.fillStyle = '#3a3a3a';
+    ctx.fillRect(4, -78, 22, 20);
+    ctx.fillStyle = '#555';
+    ctx.fillRect(5, -77, 20, 18);
+
+    // ── Cab windshield (tall, large — Sprinter style) ─────────────────────
+    ctx.fillStyle = '#111';
+    ctx.fillRect(106, -84, 42, 2);   // roof rail over cab
+    ctx.fillRect(106, -84, 4, 62);   // B-pillar
+    ctx.fillRect(144, -82, 4, 60);   // A-pillar
+    ctx.fillStyle = '#3a3a3a';
+    ctx.fillRect(110, -82, 34, 48);  // main glass area
+    ctx.fillStyle = '#505050';
+    ctx.fillRect(112, -80, 28, 44);
+    ctx.fillStyle = '#686868';
+    ctx.fillRect(114, -78, 18, 22);  // highlight
+
+    // ── Body outlines ────────────────────────────────────────────────────
+    ctx.fillStyle = '#111';
+    ctx.fillRect(0,  -84, 106, 2);   // body top edge
+    ctx.fillRect(0,  -84,   2, 62);  // rear edge
+    // Panel seam lines
+    ctx.fillStyle = YDK;
+    ctx.fillRect(2,  -82,   1, 58);  // rear door vertical seam
+    ctx.fillRect(2,  -50, 102,  1);  // mid-body horizontal seam
+    ctx.fillRect(58, -82,   1, 30);  // centre vertical panel seam
+
+    // ── Thick red MDA stripe (full width) ─────────────────────────────────
+    ctx.fillStyle = RED;
+    ctx.fillRect(0, -42, 150, 12);
+
+    // ── Star of David — red, centred on body above stripe ─────────────────
+    const u = 5, scx = 52, scy = -65;
+    ctx.fillStyle = RED;
+    ctx.fillRect(scx - 2,  scy - 20,  5, u);   // top spike
+    ctx.fillRect(scx - 8,  scy - 15, 18, u);
+    ctx.fillRect(scx - 13, scy - 10, 28, u);
+    ctx.fillRect(scx - 18, scy -  5, 11, u);   // left wing
+    ctx.fillRect(scx +  8, scy -  5, 11, u);   // right wing
+    ctx.fillRect(scx - 18, scy,      37, u);   // centre full row
+    ctx.fillRect(scx - 18, scy +  5, 11, u);
+    ctx.fillRect(scx +  8, scy +  5, 11, u);
+    ctx.fillRect(scx - 13, scy + 10, 28, u);
+    ctx.fillRect(scx -  8, scy + 15, 18, u);
+    ctx.fillRect(scx -  2, scy + 20,  5, u);   // bottom spike
+
+    // ── Rear tail lights ─────────────────────────────────────────────────
+    ctx.fillStyle = '#ff3333';
+    ctx.fillRect(0, -34, 4, 8);
+    ctx.fillStyle = '#cc2200';
+    ctx.fillRect(0, -26, 4, 4);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, -22, 4, 4);      // reverse light
+
+    // ── Front headlight ──────────────────────────────────────────────────
+    ctx.fillStyle = '#ffffcc';
+    ctx.fillRect(146, -34, 4, 8);
+    ctx.fillStyle = '#ffff88';
+    ctx.fillRect(147, -33, 3, 6);
+
+    // ── Siren dome on roof (flashing red) ────────────────────────────────
+    ctx.fillStyle = '#111';
+    ctx.fillRect(64, -88, 16, 4);    // dome base
+    ctx.fillStyle = flashOn ? '#ff3333' : '#881111';
+    ctx.fillRect(66, -94, 12, 6);    // dome light
 
     ctx.restore();
   },
@@ -1259,7 +1328,7 @@ const OBSTACLE_TYPES = [
   { type: 'pedestrian', w: 22, h: 66, minLevel: 1, aerial: false },
   { type: 'cat',        w: 36, h: 20, minLevel: 1, aerial: false },
   { type: 'bird',       w: 44, h: 18, minLevel: 2, aerial: true, airY: GROUND_Y - 50 },
-  { type: 'drone',      w: 72, h: 28, minLevel: 3, aerial: true, airY: GROUND_Y - 90 },
+  { type: 'drone',      w: 58, h: 22, minLevel: 1, aerial: true, airY: GROUND_Y - 55 },
 ];
 
 class Obstacle {
@@ -1274,7 +1343,7 @@ class Obstacle {
     this.animTimer = 0;
     this.y = def.aerial ? def.airY : GROUND_Y;
     // Pedestrian: random speed 20%-40% of scroll (runs right, net moves left slower)
-    this.speedFactor = this.type === 'pedestrian' ? (0.2 + Math.random() * 0.2) : 1.0;
+    this.speedFactor = this.type === 'pedestrian' ? (0.1 + Math.random() * 0.15) : 1.0;
     // Pedestrian: random gender (0=male, 1=female) and clothing scheme (0-4)
     this.pedGender = this.type === 'pedestrian' ? Math.floor(Math.random() * 2) : 0;
     this.pedScheme = this.type === 'pedestrian' ? Math.floor(Math.random() * 5) : 0;
@@ -1518,6 +1587,10 @@ class Game {
     this.shelterEntryTimer = 0;
     this.levelIntro = true;
     this.state = STATE.PLAYING;
+    // Ambient missiles during gameplay
+    this.ambientTrails = [];
+    this.ambientExplosions = [];
+    this.ambientMissileTimer = 1.5 + Math.random() * 2;
   }
 
   _completeLevel() {
@@ -1553,8 +1626,7 @@ class Game {
   _updateAlert(dt) {
     this.alertTimer += dt;
     this.alertFlash += dt;
-    this.alertCountdown = Math.max(1, 3 - Math.floor(this.alertTimer));
-    if (this.alertTimer >= 3.2) this._startLevel();
+    if (this.alertTimer >= 2.0) this._startLevel();
   }
 
   _updatePlaying(dt) {
@@ -1629,7 +1701,11 @@ class Game {
     // Spawn obstacles
     this.spawnTimer -= dt;
     if (this.spawnTimer <= 0) {
-      this.obstacles.push(new Obstacle(this.currentLevel + 1));
+      const candidate = new Obstacle(this.currentLevel + 1);
+      const tooClose = candidate.type === 'pedestrian' &&
+        this.obstacles.some(o => o.type === 'pedestrian' && Math.abs(o.x - candidate.x) < 120);
+      const skipDrone = candidate.type === 'drone' && Math.random() < 0.5;
+      if (!tooClose && !skipDrone) this.obstacles.push(candidate);
       this.spawnTimer = this.spawnInterval * (0.7 + Math.random() * 0.6);
     }
 
@@ -1644,6 +1720,29 @@ class Game {
         return;
       }
     }
+
+    // Ambient missiles
+    const TRAIL_DUR = 0.57;
+    this.ambientMissileTimer -= dt;
+    if (this.ambientMissileTimer <= 0) {
+      const tx = 40 + Math.floor(Math.random() * (W - 80));
+      const ty = 10 + Math.floor(Math.random() * 52);
+      this.ambientTrails.push({ x: tx, fromY: GROUND_Y - 4, toY: ty, t: 0, duration: TRAIL_DUR });
+      // schedule explosion to spawn when trail arrives
+      this.ambientTrails[this.ambientTrails.length - 1].explodeAt = TRAIL_DUR;
+      this.ambientTrails[this.ambientTrails.length - 1].exploded = false;
+      this.ambientMissileTimer = 2.5 + Math.random() * 3;
+    }
+    for (const tr of this.ambientTrails) {
+      tr.t += dt;
+      if (!tr.exploded && tr.t >= tr.explodeAt) {
+        tr.exploded = true;
+        this.ambientExplosions.push({ x: tr.x, y: tr.toY, t: 0, duration: 0.6 });
+      }
+    }
+    for (const ex of this.ambientExplosions) ex.t += dt;
+    this.ambientTrails      = this.ambientTrails.filter(tr => tr.t < tr.duration + 0.1);
+    this.ambientExplosions  = this.ambientExplosions.filter(ex => ex.t < ex.duration);
   }
 
   _draw() {
@@ -1698,13 +1797,10 @@ class Game {
     ctx.textAlign = 'center';
     ctx.font = 'bold 34px monospace';
     ctx.fillStyle = '#fff';
-    ctx.fillText('!! TZEVA ADOM !!', W / 2, 88);
+    ctx.fillText(`🚀 צבע אדום 🚀`, W / 2, H / 2 - 20);
     ctx.font = 'bold 20px monospace';
     ctx.fillStyle = '#aaa';
-    ctx.fillText(`LEVEL ${this.currentLevel + 1}`, W / 2, 126);
-    ctx.font = 'bold 70px monospace';
-    ctx.fillStyle = '#fff';
-    ctx.fillText(this.alertCountdown, W / 2, 208);
+    ctx.fillText(`LEVEL ${this.currentLevel + 1}/${LEVELS.length}`, W / 2, H / 2 + 20);
     ctx.textAlign = 'left';
   }
 
@@ -1727,7 +1823,12 @@ class Game {
       Art.drawShawarmaKioskFront(ctx, this.kioskScreenX, GROUND_Y);
       ctx.restore();
     } else {
-      this.background.draw(ctx);
+      this.background.draw(ctx, () => {
+        for (const tr of this.ambientTrails) {
+          if (tr.t < tr.duration)
+            Art.drawRocketTrail(ctx, tr.x, tr.fromY, tr.toY, tr.t / tr.duration);
+        }
+      });
       // Kiosk scrolls away as a background element after intro
       if (this.kioskVisible) {
         Art.drawShawarmaKioskBack(ctx, this.kioskScreenX, GROUND_Y);
@@ -1735,6 +1836,9 @@ class Game {
       }
       this.obstacles.forEach(o => o.draw(ctx));
       this.shelter.draw(ctx);
+      for (const ex of this.ambientExplosions) {
+        Art.drawExplosion(ctx, ex.x, ex.y, ex.t / ex.duration);
+      }
 
       if (this.shelterEntering) {
         const entryDepth = Math.max(0, this.player.x - this.shelter.x);
@@ -1799,6 +1903,9 @@ class Game {
         pedGender: hitObstacle.pedGender,
         pedScheme: hitObstacle.pedScheme,
         angle: 0,
+        spinAngle: 0,
+        smoke: [],
+        smokeTimer: 0,
       };
       this.obstacles = this.obstacles.filter(o => o !== hitObstacle);
     }
@@ -1841,6 +1948,22 @@ class Game {
       } else if (hr.type === 'trashcan') {
         // Trash can tips to the right (clockwise, positive angle)
         hr.angle = Math.min(Math.PI / 2, (this.crashTimer / 0.4) * (Math.PI / 2));
+      } else if (hr.type === 'scooter') {
+        // Scooter falls to the left (counter-clockwise, negative angle)
+        hr.angle = Math.min(Math.PI / 2, (this.crashTimer / 0.5) * (Math.PI / 2));
+      } else if (hr.type === 'drone') {
+        // One full spin (2π) while falling
+        hr.spinAngle = Math.min(Math.PI * 2, hr.spinAngle + 9 * dt);
+        hr.x += Math.sin(hr.spinAngle * 0.9) * 55 * dt;
+        hr.y = Math.min(GROUND_Y - 14, hr.y + 220 * dt);
+        // Smoke puffs trail from drone while falling
+        hr.smokeTimer += dt;
+        if (hr.smokeTimer > 0.12) {
+          hr.smokeTimer = 0;
+          hr.smoke.push({ x: hr.x + (Math.random() - 0.5) * 16, y: hr.y, t: 0, dur: 0.9, r: 3 + Math.random() * 5 });
+        }
+        for (const s of hr.smoke) { s.t += dt; s.y -= 28 * dt; s.r += 9 * dt; }
+        hr.smoke = hr.smoke.filter(s => s.t < s.dur);
       }
     }
 
@@ -1903,6 +2026,30 @@ class Game {
         ctx2.rotate(hr.angle);
         ctx2.translate(-hr.x, -GROUND_Y);
         Art.drawTrashCan(ctx2, hr.x, hr.y);
+        ctx2.restore();
+      } else if (hr.type === 'scooter') {
+        // Falls left: pivot at wheel base (x, GROUND_Y), rotate counter-clockwise
+        ctx2.save();
+        ctx2.translate(hr.x, GROUND_Y);
+        ctx2.rotate(-hr.angle);
+        ctx2.translate(-hr.x, -GROUND_Y);
+        Art.drawScooter(ctx2, hr.x, hr.y);
+        ctx2.restore();
+      } else if (hr.type === 'drone') {
+        // Smoke puffs (draw behind drone)
+        for (const s of hr.smoke) {
+          const alpha = (1 - s.t / s.dur) * 0.72;
+          const r = Math.round(s.r);
+          ctx2.fillStyle = `rgba(70,70,70,${alpha})`;
+          ctx2.fillRect(Math.round(s.x) - r, Math.round(s.y) - r, r * 2, r * 2);
+          ctx2.fillStyle = `rgba(140,140,140,${alpha * 0.5})`;
+          ctx2.fillRect(Math.round(s.x) - Math.round(r * 0.6), Math.round(s.y) - Math.round(r * 0.6), Math.round(r * 1.2), Math.round(r * 1.2));
+        }
+        // Drone: rotate one full spin around its own center while dropping
+        ctx2.save();
+        ctx2.translate(hr.x, hr.y);
+        ctx2.rotate(hr.spinAngle);
+        Art.drawDrone(ctx2, 0, 0, hr.animFrame);
         ctx2.restore();
       }
     }
