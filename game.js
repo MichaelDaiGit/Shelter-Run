@@ -10,12 +10,10 @@ const PLAYER_X = 80;
 const STATE = { MENU: 0, ALERT: 1, PLAYING: 2, LEVEL_COMPLETE: 3, GAME_OVER: 4, VICTORY: 5, CRASH_ANIM: 6 };
 
 const LEVELS = [
-  { time: 60, speed: 1.0, spawnMult: 1.0 },
-  { time: 50, speed: 1.2, spawnMult: 0.85 },
-  { time: 40, speed: 1.4, spawnMult: 0.70 },
-  { time: 30, speed: 1.7, spawnMult: 0.55 },
-  { time: 20, speed: 2.0, spawnMult: 0.40 },
-  { time: 10, speed: 2.5, spawnMult: 0.25 },
+  { time: 60, speed: 1.0, spawnMult: 1.0  },
+  { time: 45, speed: 1.3, spawnMult: 0.80 },
+  { time: 30, speed: 1.7, spawnMult: 0.60 },
+  { time: 15, speed: 2.2, spawnMult: 0.40 },
 ];
 
 const BASE_SPEED = 312;
@@ -47,25 +45,94 @@ const Art = {
       const bob = state === 'run' ? [2, 0, 2, 0][frame % 4] : 0;
       ctx.save();
       ctx.translate(0, bob);
-      // head
+
+      // Per-frame arm swing (near arm / far arm offsets)
+      const ARM = state === 'jump'
+        ? { nY: -7, fY: 5 }
+        : [{ nY: -5, fY: 5 }, { nY: -2, fY: 2 }, { nY: 5, fY: -5 }, { nY: 2, fY: -2 }][frame % 4];
+
+      // ── FAR ARM (behind body, drawn first) ─────────────────────────────────
+      ctx.fillStyle = '#8c1e10';              // dark sleeve back
+      ctx.fillRect(-7, -46 + ARM.fY, 6, 8);
+      ctx.fillStyle = '#c07840';              // far forearm skin
+      ctx.fillRect(-8, -39 + ARM.fY, 5, 7);
+      ctx.fillStyle = '#b06030';              // far hand
+      ctx.fillRect(-7, -33 + ARM.fY, 4, 4);
+
+      // ── T-SHIRT BODY ───────────────────────────────────────────────────────
+      ctx.fillStyle = '#c03020';              // red shirt
+      ctx.fillRect(-4, -50, 15, 24);
+      ctx.fillStyle = '#8c1e10';              // back/shadow side
+      ctx.fillRect(-4, -50, 5, 24);
+      ctx.fillStyle = '#d84030';              // chest highlight
+      ctx.fillRect(3, -49, 5, 15);
+      // Collar
+      ctx.fillStyle = '#f0d0b8';              // skin at collar
+      ctx.fillRect(1, -50, 7, 5);
+      // Outlines
+      ctx.fillStyle = '#111';
+      ctx.fillRect(-5, -51, 17, 2);           // shoulder top
+      ctx.fillRect(-5, -51, 2, 26);           // back outline
+      ctx.fillRect(11, -51, 2, 26);           // front outline
+      ctx.fillRect(-5, -26, 17, 2);           // hem
+
+      // ── NEAR ARM (front, full detail) ──────────────────────────────────────
+      ctx.fillStyle = '#c03020';              // near sleeve
+      ctx.fillRect(10, -47 + ARM.nY, 7, 9);
+      ctx.fillStyle = '#111';                 // sleeve outline
+      ctx.fillRect(10, -47 + ARM.nY, 7, 2);
+      ctx.fillRect(16, -47 + ARM.nY, 2, 9);
+      ctx.fillStyle = '#f5c090';              // near forearm skin
+      ctx.fillRect(11, -39 + ARM.nY, 6, 8);
+      ctx.fillStyle = '#111';
+      ctx.fillRect(16, -39 + ARM.nY, 2, 8);  // forearm front edge
+      ctx.fillStyle = '#e5a870';              // near hand
+      ctx.fillRect(11, -32 + ARM.nY, 6, 4);
+
+      // ── FACE (side profile, facing right) ──────────────────────────────────
+      ctx.fillStyle = '#f5c090';              // skin
+      ctx.fillRect(-2, -65, 13, 14);
+      // Ear
+      ctx.fillStyle = '#111';
+      ctx.fillRect(-5, -62, 5, 8);
+      ctx.fillStyle = '#e0a060';
+      ctx.fillRect(-4, -61, 3, 6);
+      // Face outline
+      ctx.fillStyle = '#333';
+      ctx.fillRect(-3, -66, 15, 2);           // forehead top
+      ctx.fillRect(-3, -66, 2, 17);           // back of head
+      ctx.fillRect(11, -65, 2, 15);           // face/nose front
+      ctx.fillRect(-3, -50, 15, 2);           // chin
+      // Nose bump
+      ctx.fillStyle = '#e0a060';
+      ctx.fillRect(12, -58, 2, 4);
+      // Eye
       ctx.fillStyle = '#fff';
-      ctx.fillRect(-8, -64, 16, 14);
-      ctx.fillStyle = '#000';
-      ctx.fillRect(-8, -64, 16, 2);
-      ctx.fillRect(-8, -64, 2, 14);
-      ctx.fillRect(6,  -64, 2, 14);
-      ctx.fillRect(-8, -52, 16, 2);
-      ctx.fillRect(2, -60, 3, 3);
-      // body
-      ctx.fillStyle = '#000';
-      ctx.fillRect(-8, -50, 16, 24);
+      ctx.fillRect(6, -61, 4, 3);
+      ctx.fillStyle = '#111';
+      ctx.fillRect(7, -61, 3, 3);
       ctx.fillStyle = '#fff';
-      ctx.fillRect(-5, -48, 10, 8);
-      // arms — 4-frame swing opposite to lead leg
-      const armOff = state === 'jump' ? -6 : [-5, -2, 5, 2][frame % 4];
-      ctx.fillStyle = '#000';
-      ctx.fillRect(-16, -46 + armOff, 8, 6);
-      ctx.fillRect(8,   -46 - armOff, 8, 6);
+      ctx.fillRect(9, -61, 1, 1);             // eye highlight
+
+      // ── BASEBALL CAP ───────────────────────────────────────────────────────
+      ctx.fillStyle = '#1a2244';              // navy dome
+      ctx.fillRect(-3, -75, 15, 11);
+      ctx.fillStyle = '#2a3566';              // dome highlight
+      ctx.fillRect(0, -74, 7, 5);
+      ctx.fillStyle = '#111';                 // outline
+      ctx.fillRect(-4, -76, 17, 2);           // top edge
+      ctx.fillRect(-4, -76, 2, 14);           // back edge
+      ctx.fillRect(12, -76, 2, 12);           // front edge above brim
+      // Brim (extends right / forward)
+      ctx.fillStyle = '#1a2244';
+      ctx.fillRect(11, -67, 12, 4);
+      ctx.fillStyle = '#111';
+      ctx.fillRect(11, -63, 12, 2);           // brim underside
+      ctx.fillRect(22, -67, 2, 6);            // brim tip
+      // Sweatband stripe
+      ctx.fillStyle = '#111';
+      ctx.fillRect(-3, -66, 15, 2);
+
       ctx.restore();
       // legs
       if (state === 'jump') {
@@ -1127,30 +1194,89 @@ const Art = {
     ctx.save();
     ctx.translate(x, y);
     ctx.imageSmoothingEnabled = false;
-    ctx.fillStyle = '#555';
-    ctx.fillRect(-8, -100, 76, 100);
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(-4, -96, 68, 96);
-    ctx.fillStyle = '#000';
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 3;
-    ctx.strokeRect(-4, -96, 68, 96);
-    for (let i = 1; i < 5; i++) {
-      ctx.fillRect(-4, -96 + i * 19, 68, 4);
+
+    // ── Shelter building structure ───────────────────────────────────────────
+    // Main concrete body (extends left of door)
+    ctx.fillStyle = '#c4c4c4';
+    ctx.fillRect(-132, -96, 126, 96);   // left building body
+
+    // Left pilaster / thick outer wall
+    ctx.fillStyle = '#aaa';
+    ctx.fillRect(-132, -96, 16, 96);
+
+    // Horizontal concrete panel seams
+    ctx.fillStyle = '#b0b0b0';
+    ctx.fillRect(-132, -64, 126, 3);
+    ctx.fillRect(-132, -34, 126, 3);
+
+    // Ventilation grilles (low on the wall — shelters need air)
+    ctx.fillStyle = '#777';
+    ctx.fillRect(-112, -28, 28, 10);    // left vent
+    ctx.fillRect(-72,  -28, 28, 10);    // centre vent
+    ctx.fillStyle = '#999';
+    for (let i = 0; i < 4; i++) {
+      ctx.fillRect(-112 + i * 7, -28, 3, 10);   // left vent slats
+      ctx.fillRect(-72  + i * 7, -28, 3, 10);   // centre vent slats
     }
-    ctx.fillStyle = '#000';
+
+    // Civil defence orange stripe across full building (Israeli standard)
+    ctx.fillStyle = '#e07800';
+    ctx.fillRect(-132, -48, 126, 8);
+
+    // Civil defence triangle (downward) on stripe
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(-90, -47, 2, 6);   // pixel triangle: top row
+    ctx.fillRect(-92, -45, 6, 2);
+    ctx.fillRect(-93, -43, 8, 2);
+    ctx.fillRect(-94, -41, 10, 2);
+
+    // Roof slab (overhangs building and door)
+    ctx.fillStyle = '#888';
+    ctx.fillRect(-136, -104, 212, 10);  // top slab
+    ctx.fillStyle = '#aaa';
+    ctx.fillRect(-136, -104, 212, 4);   // slab top highlight
+    ctx.fillStyle = '#666';
+    ctx.fillRect(-136, -95, 212, 2);    // slab underside shadow
+
+    // Building outline
+    ctx.fillStyle = '#555';
+    ctx.fillRect(-136, -104, 2, 104);   // left edge
+    ctx.fillRect(-132, -96, 2, 96);     // inner left wall edge
+    ctx.fillRect(-136, -104, 212, 2);   // top
+
+    // ── Reinforced door frame ────────────────────────────────────────────────
+    ctx.fillStyle = '#555';
+    ctx.fillRect(-8, -96, 76, 96);
+
+    // ── Door panel (heavy steel) ─────────────────────────────────────────────
+    ctx.fillStyle = '#d0d0d0';
+    ctx.fillRect(-4, -93, 68, 93);
+
+    // Door rivet/panel lines
+    ctx.fillStyle = '#bbb';
+    for (let i = 1; i < 5; i++) {
+      ctx.fillRect(-4, -93 + i * 18, 68, 3);
+    }
+    ctx.fillRect(28, -93, 3, 93);       // vertical centre seam
+
+    // Door handle
+    ctx.fillStyle = '#444';
     ctx.fillRect(48, -52, 10, 20);
     ctx.fillStyle = '#888';
     ctx.fillRect(50, -50, 6, 16);
+
+    // ── Door sign ────────────────────────────────────────────────────────────
     ctx.fillStyle = '#000';
-    ctx.fillRect(8, -88, 44, 24);
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(10, -86, 40, 20);
+    ctx.fillRect(4, -89, 44, 32);
+    ctx.fillStyle = '#f5a800';
+    ctx.fillRect(6, -87, 40, 28);
     ctx.fillStyle = '#000';
-    ctx.font = 'bold 8px monospace';
-    ctx.fillText('SHELTER', 12, -74);
-    ctx.font = 'bold 7px monospace';
-    ctx.fillText('MIKLAT', 14, -64);
+    ctx.font = 'bold 9px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('מקלט',   26, -75);
+    ctx.fillText('ציבורי', 26, -63);
+    ctx.textAlign = 'left';
+
     ctx.restore();
   },
 };
@@ -1328,7 +1454,7 @@ const OBSTACLE_TYPES = [
   { type: 'pedestrian', w: 22, h: 66, minLevel: 1, aerial: false },
   { type: 'cat',        w: 36, h: 20, minLevel: 1, aerial: false },
   { type: 'bird',       w: 44, h: 18, minLevel: 2, aerial: true, airY: GROUND_Y - 50 },
-  { type: 'drone',      w: 58, h: 22, minLevel: 1, aerial: true, airY: GROUND_Y - 55 },
+  { type: 'drone',      w: 58, h: 22, minLevel: 2, aerial: true, airY: GROUND_Y - 55 },
 ];
 
 class Obstacle {
@@ -1362,7 +1488,7 @@ class Obstacle {
   }
 
   update(dt, speed) {
-    this.x -= speed * this.speedFactor * dt;
+    this.x -= (this.pedAbsSpeed !== undefined ? speed - this.pedAbsSpeed : speed * this.speedFactor) * dt;
     this.animTimer += dt;
     if (this.animTimer > 0.12) { this.animTimer = 0; this.animFrame = (this.animFrame + 1) % 4; }
   }
@@ -1573,6 +1699,7 @@ class Game {
     this.timeLeft = def.time;
     this.levelTotalTime = def.time;
     this.speed = BASE_SPEED * def.speed * 0.90;  // starts slow, ramps up during play
+    this.levelBaseSpeed = BASE_SPEED * def.speed;
     this.spawnInterval = BASE_SPAWN_INTERVAL * def.spawnMult;
     this.spawnTimer = this.spawnInterval * 0.5;
     this.obstacles = [];
@@ -1702,6 +1829,8 @@ class Game {
     this.spawnTimer -= dt;
     if (this.spawnTimer <= 0) {
       const candidate = new Obstacle(this.currentLevel + 1);
+      if (candidate.type === 'pedestrian')
+        candidate.pedAbsSpeed = (0.10 + Math.random() * 0.10) * this.levelBaseSpeed;
       const tooClose = candidate.type === 'pedestrian' &&
         this.obstacles.some(o => o.type === 'pedestrian' && Math.abs(o.x - candidate.x) < 120);
       const skipDrone = candidate.type === 'drone' && Math.random() < 0.5;
@@ -1710,11 +1839,27 @@ class Game {
     }
 
     this.obstacles.forEach(o => o.update(dt, this.speed));
-    this.obstacles = this.obstacles.filter(o => o.x > -100);
 
-    // Obstacle collision
+    // Cat scare: player clears a cat → cat jumps and bolts rightward off screen
+    for (const o of this.obstacles) {
+      if (o.type === 'cat' && !o.ranAway && o.x + o.w / 2 < this.player.x - 10) {
+        o.ranAway = true;
+        o.vy = -260;  // jump upward
+      }
+    }
+    for (const o of this.obstacles) {
+      if (o.ranAway) {
+        o.x += 320 * dt;
+        o.vy = (o.vy || 0) + 480 * dt;  // gravity
+        o.y += o.vy * dt;
+      }
+    }
+    this.obstacles = this.obstacles.filter(o => o.ranAway ? o.x < W + 80 && o.y < GROUND_Y + 60 : o.x > -100);
+
+    // Obstacle collision (skip cats that already ran away)
     const phb = this.player.hitbox;
     for (const o of this.obstacles) {
+      if (o.ranAway) continue;
       if (aabbOverlap(phb, o.hitbox)) {
         this._startCrashAnim(o);
         return;
@@ -1731,7 +1876,8 @@ class Game {
       // schedule explosion to spawn when trail arrives
       this.ambientTrails[this.ambientTrails.length - 1].explodeAt = TRAIL_DUR;
       this.ambientTrails[this.ambientTrails.length - 1].exploded = false;
-      this.ambientMissileTimer = 2.5 + Math.random() * 3;
+      const progress = Math.max(0, 1 - this.timeLeft / this.levelTotalTime);
+      this.ambientMissileTimer = (2.5 + Math.random() * 3.0) * (1 - progress) + (0.25 + Math.random() * 0.35) * progress;
     }
     for (const tr of this.ambientTrails) {
       tr.t += dt;
