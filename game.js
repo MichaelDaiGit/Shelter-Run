@@ -1,7 +1,8 @@
 'use strict';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-const W = 800, H = 300;
+let W = 800;
+const H = 300;
 const GROUND_Y = 240;
 const GRAVITY = 1400;
 const JUMP_VEL = -580;
@@ -1879,14 +1880,24 @@ class Game {
     this._touchHoldTimer = null;
 
     this._setupInput();
-    this.canvas.width = W;
-    this.canvas.height = H;
+    this._resize();
+    window.addEventListener('resize', () => this._resize());
+
     // Try to lock to landscape via Screen Orientation API (Android Chrome, etc.)
     if (screen.orientation && screen.orientation.lock) {
       screen.orientation.lock('landscape').catch(() => {});
     }
 
     requestAnimationFrame(t => this._loop(t));
+  }
+
+  _resize() {
+    const aspect = window.innerWidth / window.innerHeight;
+    W = Math.max(400, Math.round(H * aspect));
+    this.canvas.width = W;
+    this.canvas.height = H;
+    // Regenerate background tiles to cover the new width
+    this.background = new Background();
   }
 
   _setupInput() {
