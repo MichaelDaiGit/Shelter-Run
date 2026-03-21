@@ -27,143 +27,341 @@ const Art = {
     ctx.translate(x, y);
     ctx.imageSmoothingEnabled = false;
 
+    // Pixel-art color palette
+    const C = {
+      cap: '#6b7a30', capDk: '#4a5520', capBrim: '#5a6828', capHlt: '#8a9c40',
+      hair: '#1c1208',
+      skin: '#d4c4a8', skinDk: '#b8a070',
+      shirt: '#e8e8e4', shirtDk: '#c0c0bc', shirtHlt: '#f4f4f0',
+      pants: '#7a7c48', pantsDk: '#585a30', pantsHlt: '#9a9c58',
+      shoe: '#201810', sole: '#e8e8e4',
+    };
+
     if (state === 'duck') {
-      ctx.fillStyle = '#000';
-      ctx.fillRect(-14, -20, 28, 16);
+      // Shoes
+      ctx.fillStyle = C.shoe;
+      ctx.fillRect(-10, -10, 11, 6);
+      ctx.fillRect(2,   -10, 11, 6);
+      ctx.fillStyle = C.sole;
+      ctx.fillRect(-10, -5, 11, 2);
+      ctx.fillRect(2,   -5, 11, 2);
+      // Pants (crouched wide)
+      ctx.fillStyle = C.pants;
+      ctx.fillRect(-8, -22, 24, 14);
+      ctx.fillStyle = C.pantsDk;
+      ctx.fillRect(-8, -22, 6, 14);
+      ctx.fillStyle = C.pantsHlt;
+      ctx.fillRect(8, -21, 6, 8);
+      // Shirt (hunched forward)
+      ctx.fillStyle = C.shirt;
+      ctx.fillRect(-4, -34, 17, 14);
+      ctx.fillStyle = C.shirtDk;
+      ctx.fillRect(-4, -34, 5, 14);
+      ctx.fillStyle = '#333';
+      ctx.fillRect(-5, -35, 19, 2);          // shoulder top
+      ctx.fillRect(-5, -35, 2, 16);          // back edge
+      ctx.fillRect(13, -35, 2, 16);          // front edge
+      ctx.fillRect(-5, -20, 19, 2);          // hem
+
+      // Head (side profile, facing right, tucked)
       ctx.fillStyle = '#fff';
-      ctx.fillRect(-12, -18, 24, 12);
-      ctx.fillStyle = '#000';
-      ctx.fillRect(4, -30, 14, 12);
+      ctx.fillRect(4, -44, 13, 13);          // white bg — matches skull fill, no bleed
+      ctx.fillStyle = C.skin;
+      ctx.fillRect(4, -44, 13, 13);          // skull block
+      // Nose protrusion (right side)
+      ctx.fillStyle = C.skinDk;
+      ctx.fillRect(16, -41, 4, 5);
+      // Ear (back/left of skull)
+      ctx.fillStyle = '#333';
+      ctx.fillRect(2, -42, 4, 7);            // ear outline
+      ctx.fillStyle = C.skinDk;
+      ctx.fillRect(3, -41, 2, 5);            // ear inner
+      // Beard
+      ctx.fillStyle = C.hair;
+      ctx.fillRect(6, -34, 10, 4);           // chin beard
+      ctx.fillRect(12, -38, 4, 4);           // cheek / mustache
+      // Eye
       ctx.fillStyle = '#fff';
-      ctx.fillRect(6, -28, 10, 8);
-      ctx.fillStyle = '#000';
-      ctx.fillRect(12, -26, 2, 2);
-      ctx.fillRect(-8, -4, 7, 8);
-      ctx.fillRect(2, -4, 7, 8);
+      ctx.fillRect(12, -42, 5, 3);
+      ctx.fillStyle = '#111';
+      ctx.fillRect(15, -42, 2, 3);           // pupil
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(16, -42, 1, 1);           // highlight
+      // Eyebrow
+      ctx.fillStyle = C.hair;
+      ctx.fillRect(11, -44, 6, 2);
+      // Head outline (matching running state style)
+      ctx.fillStyle = '#333';
+      ctx.fillRect(3, -45, 14, 2);           // forehead top
+      ctx.fillRect(3, -45, 2, 15);           // back of skull
+      ctx.fillRect(17, -45, 2, 5);           // upper face (above nose)
+      ctx.fillRect(20, -41, 2, 6);           // nose tip
+      ctx.fillRect(17, -35, 2, 6);           // lower face (below nose)
+      ctx.fillRect(3, -31, 22, 2);           // chin / jaw
+
+      // Cap (tilted forward over ducked head)
+      ctx.fillStyle = C.cap;
+      ctx.fillRect(2, -54, 17, 12);          // dome
+      ctx.fillStyle = C.capDk;
+      ctx.fillRect(2, -54, 6, 12);           // dome back shadow
+      ctx.fillStyle = C.capHlt;
+      ctx.fillRect(6, -53, 8, 5);            // dome highlight
+      // Dome outline
+      ctx.fillStyle = '#333';
+      ctx.fillRect(1, -55, 19, 2);           // top
+      ctx.fillRect(1, -55, 2, 14);           // back edge
+      ctx.fillRect(18, -55, 2, 12);          // front edge
+      // Sweatband
+      ctx.fillStyle = C.capDk;
+      ctx.fillRect(2, -43, 17, 2);
+      // Brim
+      ctx.fillStyle = C.capBrim;
+      ctx.fillRect(18, -46, 9, 4);
+      ctx.fillStyle = '#333';
+      ctx.fillRect(18, -42, 9, 2);           // brim underside
+      ctx.fillRect(26, -46, 2, 6);           // brim tip
+    } else if (state === 'jump') {
+      // ── JUMP POSE — draw order: back arm → back leg → torso → front arm → head/cap → front knee
+
+      // ── BACK ARM (left, extended behind body) ────────────────────────────────
+      ctx.fillStyle = C.shirtDk;
+      ctx.fillRect(-14, -50, 9, 8);            // upper sleeve going back-left
+      ctx.fillStyle = C.skinDk;
+      ctx.fillRect(-20, -46, 8, 7);            // forearm
+      ctx.fillRect(-24, -42, 7, 5);            // hand trailing back
+
+      // ── BACK LEG (left, extended behind) ─────────────────────────────────────
+      ctx.fillStyle = C.pants;
+      ctx.fillRect(-12, -28, 10, 11);          // thigh going back-left
+      ctx.fillStyle = C.pantsDk;
+      ctx.fillRect(-12, -28, 3, 11);
+      ctx.fillStyle = C.pants;
+      ctx.fillRect(-18, -20, 9, 9);            // shin kicked back
+      ctx.fillStyle = C.pantsDk;
+      ctx.fillRect(-18, -20, 3, 9);
+      ctx.fillStyle = C.shoe;
+      ctx.fillRect(-24, -14, 12, 6);           // shoe trailing behind
+      ctx.fillStyle = C.sole;
+      ctx.fillRect(-24,  -9, 12, 2);
+
+      // ── TORSO / SHIRT ─────────────────────────────────────────────────────────
+      ctx.fillStyle = C.shirt;
+      ctx.fillRect(-6, -54, 16, 26);
+      ctx.fillStyle = C.shirtDk;
+      ctx.fillRect(-6, -54, 5, 26);
+      ctx.fillStyle = C.shirtHlt;
+      ctx.fillRect(2, -53, 5, 14);
+      ctx.fillStyle = C.skin;
+      ctx.fillRect(0, -55, 6, 5);              // neck
+      ctx.fillStyle = '#333';
+      ctx.fillRect(-7, -55, 18, 2);            // shoulder top
+      ctx.fillRect(-7, -55, 2, 28);            // back edge
+      ctx.fillRect(10, -55, 2, 28);            // front edge
+      ctx.fillRect(-7, -28, 18, 2);            // hem
+
+      // ── FRONT ARM (right, bent — fist raised) ────────────────────────────────
+      ctx.fillStyle = C.shirt;
+      ctx.fillRect(10, -50, 8, 10);            // upper sleeve
+      ctx.fillStyle = '#333';
+      ctx.fillRect(10, -50, 8, 2);             // sleeve top
+      ctx.fillRect(17, -50, 2, 10);            // sleeve right edge
+      ctx.fillStyle = C.skin;
+      ctx.fillRect(15, -56, 6, 16);            // forearm going up from elbow
+      ctx.fillStyle = '#333';
+      ctx.fillRect(20, -56, 2, 16);            // forearm right edge
+      ctx.fillStyle = C.skinDk;
+      ctx.fillRect(14, -62, 8, 7);             // fist / hand
+
+      // ── HEAD ──────────────────────────────────────────────────────────────────
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(-9, -68, 18, 15);           // white bg — matches skull fill, no bleed
+      ctx.fillStyle = C.skin;
+      ctx.fillRect(-9, -68, 18, 15);
+      ctx.fillStyle = C.skinDk;
+      ctx.fillRect(9, -64, 5, 6);              // nose
+      ctx.fillStyle = '#333';
+      ctx.fillRect(-12, -64, 5, 8);            // ear outline
+      ctx.fillStyle = C.skinDk;
+      ctx.fillRect(-11, -63, 3, 6);            // ear inner
+      ctx.fillStyle = C.hair;
+      ctx.fillRect(-2, -57, 11, 5);            // chin beard
+      ctx.fillRect(5, -62, 4, 5);              // cheek/mustache
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(1, -66, 5, 3);
+      ctx.fillStyle = '#111';
+      ctx.fillRect(4, -66, 2, 3);              // pupil
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(5, -66, 1, 1);
+      ctx.fillStyle = C.hair;
+      ctx.fillRect(0, -68, 6, 2);              // eyebrow
+      ctx.fillStyle = '#333';
+      ctx.fillRect(-9, -69, 20, 2);
+      ctx.fillRect(-9, -69, 2, 17);
+      ctx.fillRect(9,  -69, 2, 6);
+      ctx.fillRect(13, -63, 2, 11);
+      ctx.fillRect(-9, -53, 22, 2);
+
+      // ── CAP ───────────────────────────────────────────────────────────────────
+      ctx.fillStyle = C.cap;
+      ctx.fillRect(-10, -78, 21, 11);
+      ctx.fillStyle = C.capDk;
+      ctx.fillRect(-10, -78, 7, 11);
+      ctx.fillStyle = C.capHlt;
+      ctx.fillRect(-5, -77, 9, 5);
+      ctx.fillStyle = '#333';
+      ctx.fillRect(-11, -79, 23, 2);
+      ctx.fillRect(-11, -79, 2, 14);
+      ctx.fillRect(10,  -79, 2, 12);
+      ctx.fillStyle = C.capBrim;
+      ctx.fillRect(10, -69, 15, 4);
+      ctx.fillStyle = '#333';
+      ctx.fillRect(10, -65, 15, 2);
+      ctx.fillRect(24, -69, 2, 6);
+      ctx.fillStyle = C.capDk;
+      ctx.fillRect(-10, -68, 21, 2);           // sweatband
+
+      // ── FRONT LEG (right, raised knee drive — drawn last, on top) ────────────
+      ctx.fillStyle = C.pants;
+      ctx.fillRect(2, -33, 18, 9);             // thigh nearly horizontal going right
+      ctx.fillStyle = C.pantsDk;
+      ctx.fillRect(2, -33, 3, 9);
+      ctx.fillStyle = C.pantsHlt;
+      ctx.fillRect(16, -32, 2, 6);
+      ctx.fillStyle = C.pants;
+      ctx.fillRect(15, -26, 8, 16);            // shin hanging straight down
+      ctx.fillStyle = C.pantsDk;
+      ctx.fillRect(15, -26, 2, 16);
+      ctx.fillStyle = C.shoe;
+      ctx.fillRect(13, -11, 12, 7);
+      ctx.fillStyle = C.sole;
+      ctx.fillRect(13,  -5, 12, 2);
+
     } else {
-      // Upper-body bob: dips down on contact frames, returns to neutral on mid-stride
-      const bob = state === 'run' ? [2, 0, 2, 0][frame % 4] : 0;
+      // ── RUN STATE ─────────────────────────────────────────────────────────────
+      const bob = [2, 0, 2, 0][frame % 4];
       ctx.save();
       ctx.translate(0, bob);
 
-      // Per-frame arm swing (near arm / far arm offsets)
-      const ARM = state === 'jump'
-        ? { nY: -7, fY: 5 }
-        : [{ nY: -5, fY: 5 }, { nY: -2, fY: 2 }, { nY: 5, fY: -5 }, { nY: 2, fY: -2 }][frame % 4];
+      // Cross-swing arm phase: near arm swings BACK when same-side leg is forward
+      const ARM = [{ nY: 6, fY: -6 }, { nY: 2, fY: -2 }, { nY: -6, fY: 6 }, { nY: -2, fY: 2 }][frame % 4];
 
-      // ── FAR ARM (behind body, drawn first) ─────────────────────────────────
-      ctx.fillStyle = '#8c1e10';              // dark sleeve back
-      ctx.fillRect(-7, -46 + ARM.fY, 6, 8);
-      ctx.fillStyle = '#c07840';              // far forearm skin
-      ctx.fillRect(-8, -39 + ARM.fY, 5, 7);
-      ctx.fillStyle = '#b06030';              // far hand
-      ctx.fillRect(-7, -33 + ARM.fY, 4, 4);
+      // ── FAR ARM (right side, behind body) ────────────────────────────────────
+      ctx.fillStyle = C.shirtDk;
+      ctx.fillRect(8, -50 + ARM.fY, 7, 9);
+      ctx.fillStyle = C.skinDk;
+      ctx.fillRect(8, -42 + ARM.fY, 6, 8);
+      ctx.fillRect(8, -35 + ARM.fY, 5, 4);
 
-      // ── T-SHIRT BODY ───────────────────────────────────────────────────────
-      ctx.fillStyle = '#c03020';              // red shirt
-      ctx.fillRect(-4, -50, 15, 24);
-      ctx.fillStyle = '#8c1e10';              // back/shadow side
-      ctx.fillRect(-4, -50, 5, 24);
-      ctx.fillStyle = '#d84030';              // chest highlight
-      ctx.fillRect(3, -49, 5, 15);
-      // Collar
-      ctx.fillStyle = '#f0d0b8';              // skin at collar
-      ctx.fillRect(1, -50, 7, 5);
-      // Outlines
-      ctx.fillStyle = '#111';
-      ctx.fillRect(-5, -51, 17, 2);           // shoulder top
-      ctx.fillRect(-5, -51, 2, 26);           // back outline
-      ctx.fillRect(11, -51, 2, 26);           // front outline
-      ctx.fillRect(-5, -26, 17, 2);           // hem
-
-      // ── NEAR ARM (front, full detail) ──────────────────────────────────────
-      ctx.fillStyle = '#c03020';              // near sleeve
-      ctx.fillRect(10, -47 + ARM.nY, 7, 9);
-      ctx.fillStyle = '#111';                 // sleeve outline
-      ctx.fillRect(10, -47 + ARM.nY, 7, 2);
-      ctx.fillRect(16, -47 + ARM.nY, 2, 9);
-      ctx.fillStyle = '#f5c090';              // near forearm skin
-      ctx.fillRect(11, -39 + ARM.nY, 6, 8);
-      ctx.fillStyle = '#111';
-      ctx.fillRect(16, -39 + ARM.nY, 2, 8);  // forearm front edge
-      ctx.fillStyle = '#e5a870';              // near hand
-      ctx.fillRect(11, -32 + ARM.nY, 6, 4);
-
-      // ── FACE (side profile, facing right) ──────────────────────────────────
-      ctx.fillStyle = '#f5c090';              // skin
-      ctx.fillRect(-2, -65, 13, 14);
-      // Ear
-      ctx.fillStyle = '#111';
-      ctx.fillRect(-5, -62, 5, 8);
-      ctx.fillStyle = '#e0a060';
-      ctx.fillRect(-4, -61, 3, 6);
-      // Face outline
+      // ── TORSO / SHIRT ─────────────────────────────────────────────────────────
+      ctx.fillStyle = C.shirt;
+      ctx.fillRect(-6, -54, 16, 26);
+      ctx.fillStyle = C.shirtDk;
+      ctx.fillRect(-6, -54, 5, 26);
+      ctx.fillStyle = C.shirtHlt;
+      ctx.fillRect(2, -53, 5, 14);
+      ctx.fillStyle = C.skin;
+      ctx.fillRect(0, -55, 6, 5);
       ctx.fillStyle = '#333';
-      ctx.fillRect(-3, -66, 15, 2);           // forehead top
-      ctx.fillRect(-3, -66, 2, 17);           // back of head
-      ctx.fillRect(11, -65, 2, 15);           // face/nose front
-      ctx.fillRect(-3, -50, 15, 2);           // chin
-      // Nose bump
-      ctx.fillStyle = '#e0a060';
-      ctx.fillRect(12, -58, 2, 4);
-      // Eye
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(6, -61, 4, 3);
-      ctx.fillStyle = '#111';
-      ctx.fillRect(7, -61, 3, 3);
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(9, -61, 1, 1);             // eye highlight
+      ctx.fillRect(-7, -55, 18, 2);
+      ctx.fillRect(-7, -55, 2, 28);
+      ctx.fillRect(10, -55, 2, 28);
+      ctx.fillRect(-7, -28, 18, 2);
 
-      // ── BASEBALL CAP ───────────────────────────────────────────────────────
-      ctx.fillStyle = '#1a2244';              // navy dome
-      ctx.fillRect(-3, -75, 15, 11);
-      ctx.fillStyle = '#2a3566';              // dome highlight
-      ctx.fillRect(0, -74, 7, 5);
-      ctx.fillStyle = '#111';                 // outline
-      ctx.fillRect(-4, -76, 17, 2);           // top edge
-      ctx.fillRect(-4, -76, 2, 14);           // back edge
-      ctx.fillRect(12, -76, 2, 12);           // front edge above brim
-      // Brim (extends right / forward)
-      ctx.fillStyle = '#1a2244';
-      ctx.fillRect(11, -67, 12, 4);
-      ctx.fillStyle = '#111';
-      ctx.fillRect(11, -63, 12, 2);           // brim underside
-      ctx.fillRect(22, -67, 2, 6);            // brim tip
-      // Sweatband stripe
-      ctx.fillStyle = '#111';
-      ctx.fillRect(-3, -66, 15, 2);
+      // ── NEAR ARM (left side, front) ───────────────────────────────────────────
+      ctx.fillStyle = C.shirt;
+      ctx.fillRect(-10, -50 + ARM.nY, 8, 9);
+      ctx.fillStyle = '#333';
+      ctx.fillRect(-10, -50 + ARM.nY, 8, 2);
+      ctx.fillRect(-10, -50 + ARM.nY, 2, 9);
+      ctx.fillStyle = C.skin;
+      ctx.fillRect(-10, -42 + ARM.nY, 7, 8);
+      ctx.fillStyle = '#333';
+      ctx.fillRect(-10, -42 + ARM.nY, 2, 8);
+      ctx.fillStyle = C.skinDk;
+      ctx.fillRect(-10, -35 + ARM.nY, 7, 4);
 
-      ctx.restore();
-      // legs
-      if (state === 'jump') {
-        ctx.fillRect(-6, -26, 6, 18);
-        ctx.fillRect(1,  -26, 6, 18);
+      // ── HEAD ──────────────────────────────────────────────────────────────────
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(-9, -68, 18, 15);           // white bg — matches skull fill, no bleed
+      ctx.fillStyle = C.skin;
+      ctx.fillRect(-9, -68, 18, 15);
+      ctx.fillStyle = C.skinDk;
+      ctx.fillRect(9, -64, 5, 6);
+      ctx.fillStyle = '#333';
+      ctx.fillRect(-12, -64, 5, 8);
+      ctx.fillStyle = C.skinDk;
+      ctx.fillRect(-11, -63, 3, 6);
+      ctx.fillStyle = C.hair;
+      ctx.fillRect(-2, -57, 11, 5);
+      ctx.fillRect(5, -62, 4, 5);
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(1, -66, 5, 3);
+      ctx.fillStyle = '#111';
+      ctx.fillRect(4, -66, 2, 3);
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(5, -66, 1, 1);
+      ctx.fillStyle = C.hair;
+      ctx.fillRect(0, -68, 6, 2);
+      ctx.fillStyle = '#333';
+      ctx.fillRect(-9, -69, 20, 2);
+      ctx.fillRect(-9, -69, 2, 17);
+      ctx.fillRect(9,  -69, 2, 6);
+      ctx.fillRect(13, -63, 2, 11);
+      ctx.fillRect(-9, -53, 22, 2);
+
+      // ── CAP ───────────────────────────────────────────────────────────────────
+      ctx.fillStyle = C.cap;
+      ctx.fillRect(-10, -78, 21, 11);
+      ctx.fillStyle = C.capDk;
+      ctx.fillRect(-10, -78, 7, 11);
+      ctx.fillStyle = C.capHlt;
+      ctx.fillRect(-5, -77, 9, 5);
+      ctx.fillStyle = '#333';
+      ctx.fillRect(-11, -79, 23, 2);
+      ctx.fillRect(-11, -79, 2, 14);
+      ctx.fillRect(10,  -79, 2, 12);
+      ctx.fillStyle = C.capBrim;
+      ctx.fillRect(10, -69, 15, 4);
+      ctx.fillStyle = '#333';
+      ctx.fillRect(10, -65, 15, 2);
+      ctx.fillRect(24, -69, 2, 6);
+      ctx.fillStyle = C.capDk;
+      ctx.fillRect(-10, -68, 21, 2);
+
+      ctx.restore(); // end bob
+
+      // ── RUN LEGS (4-frame cycle) ──────────────────────────────────────────────
+      // [lThX, lShX, lFtX, lFtYoff,  rThX, rShX, rFtX, rFtYoff]
+      const RUN = [
+        [-8, -6, -8, -8,   2,  2,  1,  0],
+        [-6, -5, -7, -3,   0,  0, -2,  0],
+        [-2, -2, -3,  0,   1, -1,  0, -8],
+        [-5, -4, -6,  0,   2,  2,  1, -3],
+      ];
+      const f = frame % 4;
+      const [lTh, lSh, lFt, lFY, rTh, rSh, rFt, rFY] = RUN[f];
+      const drawLeg = (thX, shX, ftX, ftYoff) => {
+        ctx.fillStyle = C.pants;
+        ctx.fillRect(thX, -28, 7, 13);
+        ctx.fillStyle = C.pantsDk;
+        ctx.fillRect(thX, -28, 3, 13);
+        ctx.fillStyle = C.pantsHlt;
+        ctx.fillRect(thX + 4, -27, 2, 8);
+        ctx.fillStyle = C.pants;
+        ctx.fillRect(shX, -15, 6, 9);
+        ctx.fillStyle = C.pantsDk;
+        ctx.fillRect(shX, -15, 2, 9);
+        ctx.fillStyle = C.shoe;
+        ctx.fillRect(ftX - 1, -6 + ftYoff, 11, 6);
+        ctx.fillStyle = C.sole;
+        ctx.fillRect(ftX - 1, -1 + ftYoff, 11, 2);
+      };
+      if (f < 2) {
+        drawLeg(lTh, lSh, lFt, lFY);
+        drawLeg(rTh, rSh, rFt, rFY);
       } else {
-        // 4-frame articulated run cycle
-        // Thigh: (thX, -26, 5, 12) hip→knee; Shin: (shX, -14, 5, 10) knee→ankle; Foot: (ftX, -4+ftY, 8, 4)
-        // [lThX, lShX, lFtX, lFtY,  rThX, rShX, rFtX, rFtY]
-        const RUN = [
-          [-7, -5, -7, -8,   2,  1,  0,  0],  // f0: L raised+back,  R planted+fwd
-          [-5, -5, -7, -3,   0,  0, -2,  0],  // f1: L swings fwd,   R under body
-          [-3, -3, -5,  0,   0, -2, -1, -8],  // f2: L planted+fwd,  R raised+back
-          [-4, -4, -6,  0,   1,  2,  0, -3],  // f3: L under body,   R swings fwd
-        ];
-        const f = frame % 4;
-        const [lTh, lSh, lFt, lFY, rTh, rSh, rFt, rFY] = RUN[f];
-        const drawLeg = (thX, shX, ftX, ftYoff) => {
-          ctx.fillStyle = '#000';
-          ctx.fillRect(thX, -26, 5, 12);   // thigh
-          ctx.fillRect(shX, -14, 5, 10);   // shin
-          ctx.fillStyle = '#555';
-          ctx.fillRect(ftX, -4 + ftYoff, 8, 4); // shoe
-        };
-        if (f < 2) {
-          drawLeg(lTh, lSh, lFt, lFY); // back leg first (L)
-          drawLeg(rTh, rSh, rFt, rFY); // front leg (R)
-        } else {
-          drawLeg(rTh, rSh, rFt, rFY); // back leg first (R)
-          drawLeg(lTh, lSh, lFt, lFY); // front leg (L)
-        }
+        drawLeg(rTh, rSh, rFt, rFY);
+        drawLeg(lTh, lSh, lFt, lFY);
       }
     }
     ctx.restore();
@@ -845,29 +1043,67 @@ const Art = {
     ctx.translate(x, GROUND_Y);
     ctx.rotate(angle); // pivots around feet; π/2 = lying flat on ground
     ctx.imageSmoothingEnabled = false;
-    // Head with X eyes (knocked out)
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(-8, -64, 16, 14);
-    ctx.fillStyle = '#000';
-    ctx.fillRect(-8, -64, 16, 2);
-    ctx.fillRect(-8, -64, 2, 14);
-    ctx.fillRect(6,  -64, 2, 14);
-    ctx.fillRect(-8, -52, 16, 2);
-    // X eyes
-    ctx.fillRect(-5, -61, 2, 2); ctx.fillRect(-3, -59, 2, 2); ctx.fillRect(-5, -57, 2, 2);
-    ctx.fillRect(1,  -61, 2, 2); ctx.fillRect(3,  -59, 2, 2); ctx.fillRect(1,  -57, 2, 2);
-    // Body
-    ctx.fillStyle = '#000';
-    ctx.fillRect(-8, -50, 16, 24);
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(-5, -48, 10, 8);
-    // Arms spread
-    ctx.fillStyle = '#000';
-    ctx.fillRect(-20, -46, 12, 6);
-    ctx.fillRect(8,   -46, 12, 6);
+
+    const C = {
+      cap: '#6b7a30', capDk: '#4a5520', capBrim: '#5a6828',
+      hair: '#1c1208',
+      skin: '#d4c4a8', skinDk: '#b8a070',
+      shirt: '#e8e8e4', shirtDk: '#c0c0bc',
+      pants: '#7a7c48', pantsDk: '#585a30',
+      shoe: '#201810', sole: '#e8e8e4',
+    };
+
     // Legs
-    ctx.fillRect(-6, -26, 6, 26);
-    ctx.fillRect(1,  -26, 6, 26);
+    ctx.fillStyle = C.pants;
+    ctx.fillRect(-7, -28, 7, 28);
+    ctx.fillRect(1,  -28, 7, 28);
+    ctx.fillStyle = C.pantsDk;
+    ctx.fillRect(-7, -28, 3, 28);
+    ctx.fillRect(1,  -28, 3, 28);
+    ctx.fillStyle = C.shoe;
+    ctx.fillRect(-9,  -2, 11, 6);
+    ctx.fillRect(0,   -2, 11, 6);
+    ctx.fillStyle = C.sole;
+    ctx.fillRect(-9,   3, 11, 2);
+    ctx.fillRect(0,    3, 11, 2);
+
+    // Body
+    ctx.fillStyle = C.shirt;
+    ctx.fillRect(-6, -54, 16, 26);
+    ctx.fillStyle = C.shirtDk;
+    ctx.fillRect(-6, -54, 5, 26);
+
+    // Arms spread wide
+    ctx.fillStyle = C.shirt;
+    ctx.fillRect(-22, -50, 16, 7);
+    ctx.fillRect(10,  -50, 16, 7);
+    ctx.fillStyle = C.skin;
+    ctx.fillRect(-22, -44, 14, 5);
+    ctx.fillRect(10,  -44, 14, 5);
+
+    // Head
+    ctx.fillStyle = C.skin;
+    ctx.fillRect(-9, -68, 18, 15);
+    ctx.fillStyle = C.hair;
+    ctx.fillRect(-2, -57, 11, 5);            // beard
+
+    // X eyes (knocked out)
+    ctx.fillStyle = '#111';
+    // Left X
+    ctx.fillRect(-4, -67, 2, 2); ctx.fillRect(-2, -65, 2, 2); ctx.fillRect(0,  -63, 2, 2);
+    ctx.fillRect(0,  -67, 2, 2);             ctx.fillRect(-4, -63, 2, 2);
+    // Right X
+    ctx.fillRect(4,  -67, 2, 2); ctx.fillRect(6,  -65, 2, 2); ctx.fillRect(8,  -63, 2, 2);
+    ctx.fillRect(8,  -67, 2, 2);             ctx.fillRect(4,  -63, 2, 2);
+
+    // Cap (knocked askew)
+    ctx.fillStyle = C.cap;
+    ctx.fillRect(-10, -78, 21, 11);
+    ctx.fillStyle = C.capDk;
+    ctx.fillRect(-10, -78, 7, 11);
+    ctx.fillStyle = C.capBrim;
+    ctx.fillRect(10, -69, 14, 4);
+
     ctx.restore();
   },
 
@@ -1638,15 +1874,28 @@ class Game {
     this.kioskVisible = false;
 
     this._keys = {};
-    this._touchStartY = null;
+    this._touchActive = false;
+    this._touchStartTime = 0;
+    this._touchHoldTimer = null;
 
     this._setupInput();
     this.canvas.width = W;
     this.canvas.height = H;
+    this._resize();
+    window.addEventListener('resize', () => this._resize());
     requestAnimationFrame(t => this._loop(t));
   }
 
+  _resize() {
+    const scaleX = window.innerWidth / W;
+    const scaleY = window.innerHeight / H;
+    const scale = Math.min(scaleX, scaleY);
+    this.canvas.style.transform = `scale(${scale})`;
+    this.canvas.style.transformOrigin = 'center center';
+  }
+
   _setupInput() {
+    // Keyboard (kept for desktop)
     window.addEventListener('keydown', e => {
       const k = e.code;
       if (!this._keys[k]) { this._keys[k] = true; this._onKeyDown(k); }
@@ -1656,19 +1905,45 @@ class Game {
       this._keys[e.code] = false;
       if (e.code === 'ArrowDown') this.player.duck(false);
     });
-    this.canvas.addEventListener('touchstart', e => {
+
+    // Unified touch: tap (<180ms) = jump, hold (≥180ms) = duck
+    const HOLD_MS = 180;
+    const onTouchStart = e => {
       e.preventDefault();
-      this._touchStartY = e.touches[0].clientY;
+      this._touchActive = true;
+      this._touchStartTime = performance.now();
+      // Start hold timer — if finger stays down ≥ HOLD_MS, trigger duck
+      clearTimeout(this._touchHoldTimer);
+      this._touchHoldTimer = setTimeout(() => {
+        if (this._touchActive) {
+          this._onKeyDown('ArrowDown');
+        }
+      }, HOLD_MS);
+    };
+    const onTouchEnd = e => {
+      e.preventDefault();
+      const elapsed = performance.now() - this._touchStartTime;
+      clearTimeout(this._touchHoldTimer);
+      if (elapsed < HOLD_MS) {
+        // Short tap → jump (or menu action)
+        this._onKeyDown('Space');
+      }
+      // Release duck if active
+      this.player.duck(false);
+      this._touchActive = false;
+    };
+    const onTouchMove = e => { e.preventDefault(); };
+
+    // Listen on document so touches work even outside canvas bounds
+    document.addEventListener('touchstart', onTouchStart, { passive: false });
+    document.addEventListener('touchend', onTouchEnd, { passive: false });
+    document.addEventListener('touchcancel', onTouchEnd, { passive: false });
+    document.addEventListener('touchmove', onTouchMove, { passive: false });
+
+    // Also handle mouse click for desktop (same as tap)
+    this.canvas.addEventListener('click', e => {
       this._onKeyDown('Space');
-    }, { passive: false });
-    this.canvas.addEventListener('touchend', e => {
-      e.preventDefault(); this.player.duck(false);
-    }, { passive: false });
-    this.canvas.addEventListener('touchmove', e => {
-      e.preventDefault();
-      if (this._touchStartY !== null && e.touches[0].clientY - this._touchStartY > 30)
-        this._onKeyDown('ArrowDown');
-    }, { passive: false });
+    });
   }
 
   _onKeyDown(k) {
@@ -1923,12 +2198,12 @@ class Game {
     ctx.fillRect(W / 2 - 80, 122, 160, 2);
     ctx.font = '13px monospace';
     ctx.fillStyle = '#ccc';
-    ctx.fillText('SPACE / UP  Jump     DOWN  Duck', W / 2, 154);
+    ctx.fillText('TAP  Jump     HOLD  Duck', W / 2, 154);
     ctx.fillText('Reach the shelter before time runs out', W / 2, 174);
     if (Math.floor(Date.now() / 500) % 2 === 0) {
       ctx.font = 'bold 16px monospace';
       ctx.fillStyle = '#fff';
-      ctx.fillText('[ PRESS SPACE TO START ]', W / 2, 220);
+      ctx.fillText('[ TAP TO START ]', W / 2, 220);
     }
     ctx.textAlign = 'left';
   }
@@ -2238,7 +2513,7 @@ class Game {
     if (Math.floor(Date.now() / 500) % 2 === 0) {
       ctx.font = 'bold 14px monospace';
       ctx.fillStyle = '#fff';
-      ctx.fillText('[ PRESS SPACE TO RETRY ]', W / 2, 218);
+      ctx.fillText('[ TAP TO RETRY ]', W / 2, 218);
     }
     ctx.textAlign = 'left';
   }
@@ -2267,7 +2542,7 @@ class Game {
     if (Math.floor(Date.now() / 600) % 2 === 0) {
       ctx.font = 'bold 14px monospace';
       ctx.fillStyle = '#fff';
-      ctx.fillText('[ PRESS SPACE TO PLAY AGAIN ]', W / 2, 226);
+      ctx.fillText('[ TAP TO PLAY AGAIN ]', W / 2, 226);
     }
     ctx.textAlign = 'left';
   }
@@ -2276,3 +2551,8 @@ class Game {
 // ─── Bootstrap ───────────────────────────────────────────────────────────────
 const canvas = document.getElementById('canvas');
 new Game(canvas);
+
+// ─── Service Worker ───────────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
