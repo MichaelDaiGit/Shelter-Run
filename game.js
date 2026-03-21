@@ -1881,17 +1881,12 @@ class Game {
     this._setupInput();
     this.canvas.width = W;
     this.canvas.height = H;
-    this._resize();
-    window.addEventListener('resize', () => this._resize());
-    requestAnimationFrame(t => this._loop(t));
-  }
+    // Try to lock to landscape via Screen Orientation API (Android Chrome, etc.)
+    if (screen.orientation && screen.orientation.lock) {
+      screen.orientation.lock('landscape').catch(() => {});
+    }
 
-  _resize() {
-    const scaleX = window.innerWidth / W;
-    const scaleY = window.innerHeight / H;
-    const scale = Math.min(scaleX, scaleY);
-    this.canvas.style.transform = `scale(${scale})`;
-    this.canvas.style.transformOrigin = 'center center';
+    requestAnimationFrame(t => this._loop(t));
   }
 
   _setupInput() {

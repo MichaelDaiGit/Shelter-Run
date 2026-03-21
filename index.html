@@ -32,16 +32,54 @@
   }
   #canvas {
     display: block;
-    background: #fff;
+    background: #000;
     image-rendering: pixelated;
     image-rendering: crisp-edges;
-    /* Internal resolution stays 800×300; CSS transform scales to fit viewport */
-    width: 800px;
-    height: 300px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+  }
+  /* Rotate-your-device overlay — shown only in portrait via media query */
+  #rotate-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 9999;
+    background: #000;
+    color: #fff;
+    font-family: monospace;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+  }
+  #rotate-overlay .rotate-icon {
+    font-size: 64px;
+    animation: wobble 1.5s ease-in-out infinite;
+  }
+  #rotate-overlay p {
+    font-size: 18px;
+    text-align: center;
+    opacity: 0.8;
+  }
+  @keyframes wobble {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-20deg); }
+    75% { transform: rotate(20deg); }
+  }
+  @media (orientation: portrait) {
+    #rotate-overlay { display: flex; }
+    #canvas { display: none; }
   }
 </style>
 </head>
 <body>
+<div id="rotate-overlay">
+  <div class="rotate-icon">📱</div>
+  <p>Rotate your device<br>to landscape mode</p>
+</div>
 <canvas id="canvas"></canvas>
 <script src="game.js"></script>
 </body>
