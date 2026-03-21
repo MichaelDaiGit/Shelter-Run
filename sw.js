@@ -1,4 +1,4 @@
-const CACHE_NAME = 'shelter-run-v1';
+const CACHE_NAME = 'shelter-run-v2';
 const ASSETS = [
   './',
   './index.html',

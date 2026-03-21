@@ -11,7 +11,7 @@ const PLAYER_X = 80;
 const STATE = { MENU: 0, ALERT: 1, PLAYING: 2, LEVEL_COMPLETE: 3, GAME_OVER: 4, VICTORY: 5, CRASH_ANIM: 6 };
 
 const LEVELS = [
-  { time: 60, speed: 1.0, spawnMult: 1.0  },
+  { time: 60, speed: 1.0, spawnMult: 1.0 },
   { time: 45, speed: 1.3, spawnMult: 0.80 },
   { time: 30, speed: 1.7, spawnMult: 0.60 },
   { time: 15, speed: 2.2, spawnMult: 0.40 },
@@ -28,214 +28,77 @@ const Art = {
     ctx.translate(x, y);
     ctx.imageSmoothingEnabled = false;
 
-    // Pixel-art color palette
+    // Pixel-art color palette matching warm concept art guidelines
     const C = {
-      cap: '#6b7a30', capDk: '#4a5520', capBrim: '#5a6828', capHlt: '#8a9c40',
-      hair: '#1c1208',
-      skin: '#d4c4a8', skinDk: '#b8a070',
-      shirt: '#e8e8e4', shirtDk: '#c0c0bc', shirtHlt: '#f4f4f0',
-      pants: '#7a7c48', pantsDk: '#585a30', pantsHlt: '#9a9c58',
-      shoe: '#201810', sole: '#e8e8e4',
+      out: '#331100',
+      cap: '#FF6A00',
+      hair: '#803300',
+      skin: '#FFB86C',
+      shirt: '#FFE3AF',
+      pants: '#B34700',
+      shoe: '#4A1D00', sole: '#FFCA80',
+    };
+
+    // Helper to draw blocky pixel shapes with thick borders
+    const b = (bx, by, bw, bh, color, out = true) => {
+      if (out) {
+        ctx.fillStyle = C.out;
+        ctx.fillRect(bx - 2, by - 2, bw + 4, bh + 4);
+      }
+      ctx.fillStyle = color;
+      ctx.fillRect(bx, by, bw, bh);
+    };
+
+    // Standardized head geometry for all states
+    const drawHead = (hx, hy) => {
+      b(hx, hy - 14, 14, 14, C.skin); // Face
+      b(hx + 14, hy - 10, 4, 4, C.skin); // Nose
+      b(hx, hy - 14, 14, 14, C.skin, false); // Seamless Face Fill
+      b(hx, hy - 6, 12, 6, C.hair, false); // Beard/Jaw
+      b(hx + 10, hy - 8, 4, 4, C.hair, false); // Mustache/Cheek
+      b(hx + 6, hy - 12, 4, 4, '#fff', false); // Eye sclera
+      ctx.fillStyle = C.out; ctx.fillRect(hx + 8, hy - 12, 2, 4); // Pupil (black)
+      // Cap
+      b(hx - 2, hy - 24, 16, 10, C.cap); // Dome
+      b(hx + 14, hy - 18, 12, 4, C.cap); // Brim
     };
 
     if (state === 'duck') {
-      // Shoes
-      ctx.fillStyle = C.shoe;
-      ctx.fillRect(-10, -10, 11, 6);
-      ctx.fillRect(2,   -10, 11, 6);
-      ctx.fillStyle = C.sole;
-      ctx.fillRect(-10, -5, 11, 2);
-      ctx.fillRect(2,   -5, 11, 2);
-      // Pants (crouched wide)
-      ctx.fillStyle = C.pants;
-      ctx.fillRect(-8, -22, 24, 14);
-      ctx.fillStyle = C.pantsDk;
-      ctx.fillRect(-8, -22, 6, 14);
-      ctx.fillStyle = C.pantsHlt;
-      ctx.fillRect(8, -21, 6, 8);
-      // Shirt (hunched forward)
-      ctx.fillStyle = C.shirt;
-      ctx.fillRect(-4, -34, 17, 14);
-      ctx.fillStyle = C.shirtDk;
-      ctx.fillRect(-4, -34, 5, 14);
-      ctx.fillStyle = '#333';
-      ctx.fillRect(-5, -35, 19, 2);          // shoulder top
-      ctx.fillRect(-5, -35, 2, 16);          // back edge
-      ctx.fillRect(13, -35, 2, 16);          // front edge
-      ctx.fillRect(-5, -20, 19, 2);          // hem
+      b(-14, -8, 12, 6, C.shoe); b(-14, -2, 12, 2, C.sole, false);
+      b(2, -8, 12, 6, C.shoe); b(2, -2, 12, 2, C.sole, false);
+      b(-10, -20, 26, 12, C.pants); // crouched pants
+      b(-6, -32, 20, 14, C.shirt); // crouched torso
+      drawHead(4, -28); // Head shifted right and down
 
-      // Head (side profile, facing right, tucked)
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(4, -44, 13, 13);          // white bg — matches skull fill, no bleed
-      ctx.fillStyle = C.skin;
-      ctx.fillRect(4, -44, 13, 13);          // skull block
-      // Nose protrusion (right side)
-      ctx.fillStyle = C.skinDk;
-      ctx.fillRect(16, -41, 4, 5);
-      // Ear (back/left of skull)
-      ctx.fillStyle = '#333';
-      ctx.fillRect(2, -42, 4, 7);            // ear outline
-      ctx.fillStyle = C.skinDk;
-      ctx.fillRect(3, -41, 2, 5);            // ear inner
-      // Beard
-      ctx.fillStyle = C.hair;
-      ctx.fillRect(6, -34, 10, 4);           // chin beard
-      ctx.fillRect(12, -38, 4, 4);           // cheek / mustache
-      // Eye
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(12, -42, 5, 3);
-      ctx.fillStyle = '#111';
-      ctx.fillRect(15, -42, 2, 3);           // pupil
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(16, -42, 1, 1);           // highlight
-      // Eyebrow
-      ctx.fillStyle = C.hair;
-      ctx.fillRect(11, -44, 6, 2);
-      // Head outline (matching running state style)
-      ctx.fillStyle = '#333';
-      ctx.fillRect(3, -45, 14, 2);           // forehead top
-      ctx.fillRect(3, -45, 2, 15);           // back of skull
-      ctx.fillRect(17, -45, 2, 5);           // upper face (above nose)
-      ctx.fillRect(20, -41, 2, 6);           // nose tip
-      ctx.fillRect(17, -35, 2, 6);           // lower face (below nose)
-      ctx.fillRect(3, -31, 22, 2);           // chin / jaw
-
-      // Cap (tilted forward over ducked head)
-      ctx.fillStyle = C.cap;
-      ctx.fillRect(2, -54, 17, 12);          // dome
-      ctx.fillStyle = C.capDk;
-      ctx.fillRect(2, -54, 6, 12);           // dome back shadow
-      ctx.fillStyle = C.capHlt;
-      ctx.fillRect(6, -53, 8, 5);            // dome highlight
-      // Dome outline
-      ctx.fillStyle = '#333';
-      ctx.fillRect(1, -55, 19, 2);           // top
-      ctx.fillRect(1, -55, 2, 14);           // back edge
-      ctx.fillRect(18, -55, 2, 12);          // front edge
-      // Sweatband
-      ctx.fillStyle = C.capDk;
-      ctx.fillRect(2, -43, 17, 2);
-      // Brim
-      ctx.fillStyle = C.capBrim;
-      ctx.fillRect(18, -46, 9, 4);
-      ctx.fillStyle = '#333';
-      ctx.fillRect(18, -42, 9, 2);           // brim underside
-      ctx.fillRect(26, -46, 2, 6);           // brim tip
     } else if (state === 'jump') {
-      // ── JUMP POSE — draw order: back arm → back leg → torso → front arm → head/cap → front knee
+      // Back Arm
+      b(-16, -46, 10, 8, C.shirt);
+      b(-24, -44, 10, 8, C.skin); // Hand
+      b(-20, -48, 4, 6, C.skin);  // Thumb sticking up
+      b(-24, -44, 10, 8, C.skin, false); // Seam
+      ctx.fillStyle = C.out; ctx.fillRect(-24, -40, 4, 2); // Finger indent
 
-      // ── BACK ARM (left, extended behind body) ────────────────────────────────
-      ctx.fillStyle = C.shirtDk;
-      ctx.fillRect(-14, -50, 9, 8);            // upper sleeve going back-left
-      ctx.fillStyle = C.skinDk;
-      ctx.fillRect(-20, -46, 8, 7);            // forearm
-      ctx.fillRect(-24, -42, 7, 5);            // hand trailing back
+      // Back Leg
+      b(-12, -28, 10, 12, C.pants);
+      b(-20, -20, 10, 12, C.pants);
+      b(-28, -10, 12, 6, C.shoe); b(-28, -4, 12, 2, C.sole, false);
 
-      // ── BACK LEG (left, extended behind) ─────────────────────────────────────
-      ctx.fillStyle = C.pants;
-      ctx.fillRect(-12, -28, 10, 11);          // thigh going back-left
-      ctx.fillStyle = C.pantsDk;
-      ctx.fillRect(-12, -28, 3, 11);
-      ctx.fillStyle = C.pants;
-      ctx.fillRect(-18, -20, 9, 9);            // shin kicked back
-      ctx.fillStyle = C.pantsDk;
-      ctx.fillRect(-18, -20, 3, 9);
-      ctx.fillStyle = C.shoe;
-      ctx.fillRect(-24, -14, 12, 6);           // shoe trailing behind
-      ctx.fillStyle = C.sole;
-      ctx.fillRect(-24,  -9, 12, 2);
+      // Front Leg
+      b(0, -32, 18, 10, C.pants);
+      b(12, -26, 8, 16, C.pants);
+      b(10, -10, 12, 6, C.shoe); b(10, -4, 12, 2, C.sole, false);
 
-      // ── TORSO / SHIRT ─────────────────────────────────────────────────────────
-      ctx.fillStyle = C.shirt;
-      ctx.fillRect(-6, -54, 16, 26);
-      ctx.fillStyle = C.shirtDk;
-      ctx.fillRect(-6, -54, 5, 26);
-      ctx.fillStyle = C.shirtHlt;
-      ctx.fillRect(2, -53, 5, 14);
-      ctx.fillStyle = C.skin;
-      ctx.fillRect(0, -55, 6, 5);              // neck
-      ctx.fillStyle = '#333';
-      ctx.fillRect(-7, -55, 18, 2);            // shoulder top
-      ctx.fillRect(-7, -55, 2, 28);            // back edge
-      ctx.fillRect(10, -55, 2, 28);            // front edge
-      ctx.fillRect(-7, -28, 18, 2);            // hem
+      // Torso
+      b(-6, -52, 16, 26, C.shirt);
 
-      // ── FRONT ARM (right, bent — fist raised) ────────────────────────────────
-      ctx.fillStyle = C.shirt;
-      ctx.fillRect(10, -50, 8, 10);            // upper sleeve
-      ctx.fillStyle = '#333';
-      ctx.fillRect(10, -50, 8, 2);             // sleeve top
-      ctx.fillRect(17, -50, 2, 10);            // sleeve right edge
-      ctx.fillStyle = C.skin;
-      ctx.fillRect(15, -56, 6, 16);            // forearm going up from elbow
-      ctx.fillStyle = '#333';
-      ctx.fillRect(20, -56, 2, 16);            // forearm right edge
-      ctx.fillStyle = C.skinDk;
-      ctx.fillRect(14, -62, 8, 7);             // fist / hand
+      // Front Arm
+      b(6, -48, 10, 10, C.shirt);
+      b(12, -56, 8, 14, C.skin); // Forearm/Hand
+      b(8, -54, 6, 4, C.skin);   // Thumb inward
+      b(12, -56, 8, 14, C.skin, false); // Seam
+      ctx.fillStyle = C.out; ctx.fillRect(14, -56, 2, 4); // Finger indent top
 
-      // ── HEAD ──────────────────────────────────────────────────────────────────
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(-9, -68, 18, 15);           // white bg — matches skull fill, no bleed
-      ctx.fillStyle = C.skin;
-      ctx.fillRect(-9, -68, 18, 15);
-      ctx.fillStyle = C.skinDk;
-      ctx.fillRect(9, -64, 5, 6);              // nose
-      ctx.fillStyle = '#333';
-      ctx.fillRect(-12, -64, 5, 8);            // ear outline
-      ctx.fillStyle = C.skinDk;
-      ctx.fillRect(-11, -63, 3, 6);            // ear inner
-      ctx.fillStyle = C.hair;
-      ctx.fillRect(-2, -57, 11, 5);            // chin beard
-      ctx.fillRect(5, -62, 4, 5);              // cheek/mustache
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(1, -66, 5, 3);
-      ctx.fillStyle = '#111';
-      ctx.fillRect(4, -66, 2, 3);              // pupil
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(5, -66, 1, 1);
-      ctx.fillStyle = C.hair;
-      ctx.fillRect(0, -68, 6, 2);              // eyebrow
-      ctx.fillStyle = '#333';
-      ctx.fillRect(-9, -69, 20, 2);
-      ctx.fillRect(-9, -69, 2, 17);
-      ctx.fillRect(9,  -69, 2, 6);
-      ctx.fillRect(13, -63, 2, 11);
-      ctx.fillRect(-9, -53, 22, 2);
-
-      // ── CAP ───────────────────────────────────────────────────────────────────
-      ctx.fillStyle = C.cap;
-      ctx.fillRect(-10, -78, 21, 11);
-      ctx.fillStyle = C.capDk;
-      ctx.fillRect(-10, -78, 7, 11);
-      ctx.fillStyle = C.capHlt;
-      ctx.fillRect(-5, -77, 9, 5);
-      ctx.fillStyle = '#333';
-      ctx.fillRect(-11, -79, 23, 2);
-      ctx.fillRect(-11, -79, 2, 14);
-      ctx.fillRect(10,  -79, 2, 12);
-      ctx.fillStyle = C.capBrim;
-      ctx.fillRect(10, -69, 15, 4);
-      ctx.fillStyle = '#333';
-      ctx.fillRect(10, -65, 15, 2);
-      ctx.fillRect(24, -69, 2, 6);
-      ctx.fillStyle = C.capDk;
-      ctx.fillRect(-10, -68, 21, 2);           // sweatband
-
-      // ── FRONT LEG (right, raised knee drive — drawn last, on top) ────────────
-      ctx.fillStyle = C.pants;
-      ctx.fillRect(2, -33, 18, 9);             // thigh nearly horizontal going right
-      ctx.fillStyle = C.pantsDk;
-      ctx.fillRect(2, -33, 3, 9);
-      ctx.fillStyle = C.pantsHlt;
-      ctx.fillRect(16, -32, 2, 6);
-      ctx.fillStyle = C.pants;
-      ctx.fillRect(15, -26, 8, 16);            // shin hanging straight down
-      ctx.fillStyle = C.pantsDk;
-      ctx.fillRect(15, -26, 2, 16);
-      ctx.fillStyle = C.shoe;
-      ctx.fillRect(13, -11, 12, 7);
-      ctx.fillStyle = C.sole;
-      ctx.fillRect(13,  -5, 12, 2);
+      drawHead(-6, -52);
 
     } else {
       // ── RUN STATE ─────────────────────────────────────────────────────────────
@@ -243,127 +106,65 @@ const Art = {
       ctx.save();
       ctx.translate(0, bob);
 
-      // Cross-swing arm phase: near arm swings BACK when same-side leg is forward
       const ARM = [{ nY: 6, fY: -6 }, { nY: 2, fY: -2 }, { nY: -6, fY: 6 }, { nY: -2, fY: 2 }][frame % 4];
 
-      // ── FAR ARM (right side, behind body) ────────────────────────────────────
-      ctx.fillStyle = C.shirtDk;
-      ctx.fillRect(8, -50 + ARM.fY, 7, 9);
-      ctx.fillStyle = C.skinDk;
-      ctx.fillRect(8, -42 + ARM.fY, 6, 8);
-      ctx.fillRect(8, -35 + ARM.fY, 5, 4);
+      // ── FAR ARM
+      b(4, -48 + ARM.fY, 8, 10, C.shirt);
+      if (ARM.fY < 0) {
+        b(4, -38 + ARM.fY, 8, 8, C.skin);
+        b(12, -42 + ARM.fY, 8, 8, C.skin); // Hand forward
+        b(14, -46 + ARM.fY, 4, 6, C.skin); // Thumb up
+        b(12, -42 + ARM.fY, 8, 8, C.skin, false); // Seam
+        ctx.fillStyle = C.out; ctx.fillRect(18, -40 + ARM.fY, 4, 2); // Finger indent right
+      } else {
+        b(2, -38 + ARM.fY, 8, 8, C.skin);
+        b(-4, -34 + ARM.fY, 8, 8, C.skin); // Hand backward
+        b(0, -38 + ARM.fY, 4, 6, C.skin);  // Thumb up
+        b(-4, -34 + ARM.fY, 8, 8, C.skin, false); // Seam
+        ctx.fillStyle = C.out; ctx.fillRect(-6, -30 + ARM.fY, 4, 2); // Finger indent left
+      }
 
-      // ── TORSO / SHIRT ─────────────────────────────────────────────────────────
-      ctx.fillStyle = C.shirt;
-      ctx.fillRect(-6, -54, 16, 26);
-      ctx.fillStyle = C.shirtDk;
-      ctx.fillRect(-6, -54, 5, 26);
-      ctx.fillStyle = C.shirtHlt;
-      ctx.fillRect(2, -53, 5, 14);
-      ctx.fillStyle = C.skin;
-      ctx.fillRect(0, -55, 6, 5);
-      ctx.fillStyle = '#333';
-      ctx.fillRect(-7, -55, 18, 2);
-      ctx.fillRect(-7, -55, 2, 28);
-      ctx.fillRect(10, -55, 2, 28);
-      ctx.fillRect(-7, -28, 18, 2);
-
-      // ── NEAR ARM (left side, front) ───────────────────────────────────────────
-      ctx.fillStyle = C.shirt;
-      ctx.fillRect(-10, -50 + ARM.nY, 8, 9);
-      ctx.fillStyle = '#333';
-      ctx.fillRect(-10, -50 + ARM.nY, 8, 2);
-      ctx.fillRect(-10, -50 + ARM.nY, 2, 9);
-      ctx.fillStyle = C.skin;
-      ctx.fillRect(-10, -42 + ARM.nY, 7, 8);
-      ctx.fillStyle = '#333';
-      ctx.fillRect(-10, -42 + ARM.nY, 2, 8);
-      ctx.fillStyle = C.skinDk;
-      ctx.fillRect(-10, -35 + ARM.nY, 7, 4);
-
-      // ── HEAD ──────────────────────────────────────────────────────────────────
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(-9, -68, 18, 15);           // white bg — matches skull fill, no bleed
-      ctx.fillStyle = C.skin;
-      ctx.fillRect(-9, -68, 18, 15);
-      ctx.fillStyle = C.skinDk;
-      ctx.fillRect(9, -64, 5, 6);
-      ctx.fillStyle = '#333';
-      ctx.fillRect(-12, -64, 5, 8);
-      ctx.fillStyle = C.skinDk;
-      ctx.fillRect(-11, -63, 3, 6);
-      ctx.fillStyle = C.hair;
-      ctx.fillRect(-2, -57, 11, 5);
-      ctx.fillRect(5, -62, 4, 5);
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(1, -66, 5, 3);
-      ctx.fillStyle = '#111';
-      ctx.fillRect(4, -66, 2, 3);
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(5, -66, 1, 1);
-      ctx.fillStyle = C.hair;
-      ctx.fillRect(0, -68, 6, 2);
-      ctx.fillStyle = '#333';
-      ctx.fillRect(-9, -69, 20, 2);
-      ctx.fillRect(-9, -69, 2, 17);
-      ctx.fillRect(9,  -69, 2, 6);
-      ctx.fillRect(13, -63, 2, 11);
-      ctx.fillRect(-9, -53, 22, 2);
-
-      // ── CAP ───────────────────────────────────────────────────────────────────
-      ctx.fillStyle = C.cap;
-      ctx.fillRect(-10, -78, 21, 11);
-      ctx.fillStyle = C.capDk;
-      ctx.fillRect(-10, -78, 7, 11);
-      ctx.fillStyle = C.capHlt;
-      ctx.fillRect(-5, -77, 9, 5);
-      ctx.fillStyle = '#333';
-      ctx.fillRect(-11, -79, 23, 2);
-      ctx.fillRect(-11, -79, 2, 14);
-      ctx.fillRect(10,  -79, 2, 12);
-      ctx.fillStyle = C.capBrim;
-      ctx.fillRect(10, -69, 15, 4);
-      ctx.fillStyle = '#333';
-      ctx.fillRect(10, -65, 15, 2);
-      ctx.fillRect(24, -69, 2, 6);
-      ctx.fillStyle = C.capDk;
-      ctx.fillRect(-10, -68, 21, 2);
-
-      ctx.restore(); // end bob
-
-      // ── RUN LEGS (4-frame cycle) ──────────────────────────────────────────────
-      // [lThX, lShX, lFtX, lFtYoff,  rThX, rShX, rFtX, rFtYoff]
+      // ── LEGS
       const RUN = [
-        [-8, -6, -8, -8,   2,  2,  1,  0],
-        [-6, -5, -7, -3,   0,  0, -2,  0],
-        [-2, -2, -3,  0,   1, -1,  0, -8],
-        [-5, -4, -6,  0,   2,  2,  1, -3],
+        [-8, -6, -8, -6, 2, 2, 1, 0],
+        [-6, -5, -7, -2, 0, 0, -2, 0],
+        [-2, -2, -3, 0, 1, -1, 0, -6],
+        [-5, -4, -6, 0, 2, 2, 1, -2],
       ];
       const f = frame % 4;
       const [lTh, lSh, lFt, lFY, rTh, rSh, rFt, rFY] = RUN[f];
       const drawLeg = (thX, shX, ftX, ftYoff) => {
-        ctx.fillStyle = C.pants;
-        ctx.fillRect(thX, -28, 7, 13);
-        ctx.fillStyle = C.pantsDk;
-        ctx.fillRect(thX, -28, 3, 13);
-        ctx.fillStyle = C.pantsHlt;
-        ctx.fillRect(thX + 4, -27, 2, 8);
-        ctx.fillStyle = C.pants;
-        ctx.fillRect(shX, -15, 6, 9);
-        ctx.fillStyle = C.pantsDk;
-        ctx.fillRect(shX, -15, 2, 9);
-        ctx.fillStyle = C.shoe;
-        ctx.fillRect(ftX - 1, -6 + ftYoff, 11, 6);
-        ctx.fillStyle = C.sole;
-        ctx.fillRect(ftX - 1, -1 + ftYoff, 11, 2);
+        b(thX, -28, 10, 14, C.pants);
+        b(shX, -16, 8, 12, C.pants);
+        b(ftX - 2, -6 + ftYoff, 12, 6, C.shoe);
+        b(ftX - 2, 0 + ftYoff, 12, 2, C.sole, false);
       };
-      if (f < 2) {
-        drawLeg(lTh, lSh, lFt, lFY);
-        drawLeg(rTh, rSh, rFt, rFY);
+      if (f < 2) { drawLeg(lTh, lSh, lFt, lFY); drawLeg(rTh, rSh, rFt, rFY); }
+      else { drawLeg(rTh, rSh, rFt, rFY); drawLeg(lTh, lSh, lFt, lFY); }
+
+      // ── TORSO
+      b(-6, -52, 16, 26, C.shirt);
+
+      // ── NEAR ARM
+      b(-8, -48 + ARM.nY, 10, 10, C.shirt);
+      if (ARM.nY < 0) {
+        b(-8, -38 + ARM.nY, 8, 8, C.skin);
+        b(0, -42 + ARM.nY, 10, 8, C.skin); // Hand forward
+        b(2, -46 + ARM.nY, 4, 6, C.skin);  // Thumb up
+        b(0, -42 + ARM.nY, 10, 8, C.skin, false); // Seam
+        ctx.fillStyle = C.out; ctx.fillRect(8, -40 + ARM.nY, 4, 2); // Finger indent right
       } else {
-        drawLeg(rTh, rSh, rFt, rFY);
-        drawLeg(lTh, lSh, lFt, lFY);
+        b(-10, -38 + ARM.nY, 8, 8, C.skin);
+        b(-16, -34 + ARM.nY, 8, 8, C.skin); // Hand backward
+        b(-12, -38 + ARM.nY, 4, 6, C.skin); // Thumb up
+        b(-16, -34 + ARM.nY, 8, 8, C.skin, false); // Seam
+        ctx.fillStyle = C.out; ctx.fillRect(-18, -30 + ARM.nY, 4, 2); // Finger indent left
       }
+
+      // ── HEAD
+      drawHead(-6, -52);
+
+      ctx.restore(); // end bob
     }
     ctx.restore();
   },
@@ -399,11 +200,11 @@ const Art = {
     ctx.translate(x, y);
     ctx.imageSmoothingEnabled = false;
 
-    const OUT  = '#333';    // dark gray outline
-    const GRN  = '#1e7a30'; // deep green body
+    const OUT = '#333';    // dark gray outline
+    const GRN = '#1e7a30'; // deep green body
     const LGRN = '#34b84e'; // lighter green highlight
     const TIRE = '#222';
-    const RIM  = '#c0c0c0';
+    const RIM = '#c0c0c0';
 
     // --- Wheels (r=10, center at y=-10 so bottom touches ground) ---
     const drawWheel = (cx, cy) => {
@@ -412,20 +213,20 @@ const Art = {
       ctx.fillStyle = TIRE;
       ctx.fillRect(cx - 10, cy - 10, 20, 20); // tire
       ctx.fillStyle = RIM;
-      ctx.fillRect(cx - 6,  cy - 6,  12, 12); // rim
+      ctx.fillRect(cx - 6, cy - 6, 12, 12); // rim
       ctx.fillStyle = OUT;
-      ctx.fillRect(cx - 2,  cy - 2,  4,  4);  // hub
+      ctx.fillRect(cx - 2, cy - 2, 4, 4);  // hub
     };
     drawWheel(-22, -10); // rear wheel (left)
-    drawWheel( 20, -10); // front wheel (right)
+    drawWheel(20, -10); // front wheel (right)
 
     // --- Footboard / deck (spans between wheels, sits just above axles) ---
     ctx.fillStyle = OUT;
     ctx.fillRect(-24, -23, 46, 11);   // outline
     ctx.fillStyle = GRN;
-    ctx.fillRect(-23, -22, 44,  9);   // body
+    ctx.fillRect(-23, -22, 44, 9);   // body
     ctx.fillStyle = LGRN;
-    ctx.fillRect(-23, -22, 44,  3);   // top highlight strip
+    ctx.fillRect(-23, -22, 44, 3);   // top highlight strip
     // Grip-tape dots
     ctx.fillStyle = OUT;
     for (let tx = -19; tx < 16; tx += 6) ctx.fillRect(tx, -18, 2, 2);
@@ -462,7 +263,7 @@ const Art = {
     ctx.fillRect(3, -60, 20, 2);    // top highlight
     // Rubber grips
     ctx.fillStyle = '#222';
-    ctx.fillRect(2,  -60, 5, 4);    // left grip
+    ctx.fillRect(2, -60, 5, 4);    // left grip
     ctx.fillRect(19, -60, 5, 4);    // right grip
     // Brake lever (small tab under right grip)
     ctx.fillStyle = OUT;
@@ -476,153 +277,219 @@ const Art = {
   },
 
   drawPedestrian(ctx, x, y, frame, gender = 0, scheme = 0) {
-    // 5 clothing schemes: top, bottom, hair
+    const P = {
+      out: '#331100',
+      skin: '#FFB86C',
+      sole: '#E8E8E4' // basic white/grey sole
+    };
+
+    // 5 clothing schemes: top, bottom/shoes, hair
     const clothes = [
-      { top: '#f72', btm: '#530', hair: '#222' },  // vivid orange / brown
-      { top: '#1bc', btm: '#047', hair: '#111' },  // bright cyan / navy
-      { top: '#e22', btm: '#333', hair: '#000' },  // red / charcoal
-      { top: '#8c2', btm: '#363', hair: '#543' },  // lime green / dark green
-      { top: '#83c', btm: '#416', hair: '#222' },  // purple / dark purple
+      { top: '#FF7722', btm: '#553300', hair: '#222222', shoe: '#2B1A00' },
+      { top: '#11BBCC', btm: '#004477', hair: '#111111', shoe: '#002244' },
+      { top: '#EE2222', btm: '#333333', hair: '#000000', shoe: '#111111' },
+      { top: '#88CC22', btm: '#336633', hair: '#554433', shoe: '#2A221A' },
+      { top: '#8833CC', btm: '#441166', hair: '#222222', shoe: '#1A082A' },
     ];
     const c = clothes[scheme];
+
     ctx.save();
     ctx.translate(x, y);
     ctx.imageSmoothingEnabled = false;
 
-    if (gender === 0) {
-      // ── MALE ──
-      // Head
-      ctx.fillStyle = '#ddd';
-      ctx.fillRect(-8, -70, 16, 14);
-      ctx.fillStyle = '#000';
-      ctx.fillRect(-8, -70, 16, 2);
-      ctx.fillRect(-8, -70, 2, 14);
-      ctx.fillRect(6,  -70, 2, 14);
-      ctx.fillRect(-8, -58, 16, 2);
-      // Hair
-      ctx.fillStyle = c.hair;
-      ctx.fillRect(-8, -70, 16, 5);
-      // Eye
-      ctx.fillStyle = '#000';
-      ctx.fillRect(2, -63, 3, 3);
-      // Shirt
-      ctx.fillStyle = c.top;
-      ctx.fillRect(-7, -56, 14, 24);
-      // Arms — 4-frame swing
-      const armOff = [-4, -2, 4, 2][frame % 4];
-      ctx.fillStyle = '#ddd';
-      ctx.fillRect(-15, -54 + armOff, 8, 5);
-      ctx.fillRect(7,   -54 - armOff, 8, 5);
-      // Legs — 4-frame articulated run cycle
-      // Thigh: (thX, -32, 5, 14) hip→knee; Shin: (shX, -18, 5, 14) knee→ankle; Shoe: (ftX, -4+ftY, 8, 4)
-      const PEDRUN = [
-        [-7, -5, -7, -8,   2,  1,  0,  0],  // f0: L raised+back, R planted+fwd
-        [-5, -5, -7, -3,   0,  0, -2,  0],  // f1: L swings fwd,  R under body
-        [-3, -3, -5,  0,   0, -2, -1, -8],  // f2: L planted+fwd, R raised+back
-        [-4, -4, -6,  0,   1,  2,  0, -3],  // f3: L under body,  R swings fwd
-      ];
-      const fp = frame % 4;
-      const [lTh, lSh, lFt, lFY, rTh, rSh, rFt, rFY] = PEDRUN[fp];
-      const drawPedLeg = (thX, shX, ftX, ftYoff) => {
-        ctx.fillStyle = c.btm;
-        ctx.fillRect(thX, -32, 5, 14);   // thigh
-        ctx.fillRect(shX, -18, 5, 14);   // shin
-        ctx.fillStyle = '#111';
-        ctx.fillRect(ftX, -4 + ftYoff, 8, 4); // shoe
-      };
-      if (fp < 2) {
-        drawPedLeg(lTh, lSh, lFt, lFY);
-        drawPedLeg(rTh, rSh, rFt, rFY);
-      } else {
-        drawPedLeg(rTh, rSh, rFt, rFY);
-        drawPedLeg(lTh, lSh, lFt, lFY);
+    // Helper for thick pixel outlines
+    const b = (bx, by, bw, bh, color, out = true) => {
+      if (out) {
+        ctx.fillStyle = P.out;
+        ctx.fillRect(bx - 2, by - 2, bw + 4, bh + 4);
       }
+      ctx.fillStyle = color;
+      ctx.fillRect(bx, by, bw, bh);
+    };
+
+    const drawHeadMale = (hx, hy) => {
+      b(hx, hy - 14, 14, 14, P.skin); // Face
+      b(hx + 14, hy - 10, 4, 4, P.skin); // Nose
+      b(hx, hy - 14, 14, 14, P.skin, false); // Seamless Face Fill
+      b(hx - 2, hy - 16, 16, 6, c.hair); // Hair top
+      b(hx + 10, hy - 18, 6, 4, c.hair); // Hair front swoop
+      b(hx - 2, hy - 10, 4, 8, c.hair); // Hair back down neck
+      b(hx + 6, hy - 12, 4, 4, '#fff', false); // Eye sclera
+      ctx.fillStyle = P.out; ctx.fillRect(hx + 8, hy - 12, 2, 4); // Pupil (black)
+    };
+
+    const drawHeadFemale = (hx, hy) => {
+      b(hx, hy - 14, 14, 14, P.skin); // Face
+      b(hx + 14, hy - 10, 4, 4, P.skin); // Nose
+      b(hx, hy - 14, 14, 14, P.skin, false); // Seamless Face Fill
+      // Long hair / Ponytail
+      b(hx - 6, hy - 18, 20, 8, c.hair); // Top volume
+      b(hx + 12, hy - 14, 4, 4, c.hair, false); // Bangs
+      const bounce = frame % 2 === 0 ? 0 : 2;
+      b(hx - 14, hy - 12 - bounce, 8, 12, c.hair); // Ponytail
+      b(hx + 6, hy - 12, 4, 4, '#fff', false); // Eye sclera
+      ctx.fillStyle = P.out; ctx.fillRect(hx + 8, hy - 12, 2, 4); // Pupil (black)
+    };
+
+    const bob = [2, 0, 2, 0][frame % 4];
+    ctx.translate(0, bob);
+
+    const ARM = [{ nY: 6, fY: -6 }, { nY: 2, fY: -2 }, { nY: -6, fY: 6 }, { nY: -2, fY: 2 }][frame % 4];
+
+    // ── FAR ARM
+    b(4, -48 + ARM.fY, 8, 10, c.top);
+    if (ARM.fY < 0) {
+      b(4, -38 + ARM.fY, 8, 8, P.skin);
+      b(12, -42 + ARM.fY, 8, 8, P.skin); // Hand forward
+      b(14, -46 + ARM.fY, 4, 6, P.skin); // Thumb up
+      b(12, -42 + ARM.fY, 8, 8, P.skin, false); // Seam
+      ctx.fillStyle = P.out; ctx.fillRect(18, -40 + ARM.fY, 4, 2); // Finger indent right
     } else {
-      // ── FEMALE ──
-      // Hair (wider, above head)
-      ctx.fillStyle = c.hair;
-      ctx.fillRect(-10, -74, 20, 6);
-      ctx.fillRect(-10, -70, 3, 14);
-      ctx.fillRect(8,   -70, 3, 12);
-      const hairBounce = frame === 0 ? 2 : 0;
-      ctx.fillRect(8, -60 + hairBounce, 3, 8);  // bouncing ponytail tail
-      // Head
-      ctx.fillStyle = '#ddd';
-      ctx.fillRect(-8, -70, 16, 14);
-      ctx.fillStyle = '#000';
-      ctx.fillRect(-8, -70, 16, 2);
-      ctx.fillRect(-8, -70, 2, 14);
-      ctx.fillRect(6,  -70, 2, 14);
-      ctx.fillRect(-8, -58, 16, 2);
-      // Eye
-      ctx.fillStyle = '#000';
-      ctx.fillRect(2, -63, 3, 3);
-      // Blouse
-      ctx.fillStyle = c.top;
-      ctx.fillRect(-7, -56, 14, 18);
-      // Arms — 4-frame swing
-      const armOffF = [-4, -2, 4, 2][frame % 4];
-      ctx.fillStyle = '#ddd';
-      ctx.fillRect(-13, -54 + armOffF, 6, 5);
-      ctx.fillRect(7,   -54 - armOffF, 6, 5);
-      // Skirt body + flared hem
-      ctx.fillStyle = c.btm;
-      ctx.fillRect(-9, -38, 18, 16);
-      ctx.fillRect(-11, -26, 22, 6);
-      // Legs (skin below skirt) + shoes — 4-frame
-      const legAF = [6, 3, -6, -3][frame % 4];
-      ctx.fillStyle = '#ddd';
-      ctx.fillRect(-5, -20, 4, 20);
-      ctx.fillRect(1,  -20, 4, 20);
-      ctx.fillStyle = '#111';
-      ctx.fillRect(-5 + legAF, -4, 6, 4);
-      ctx.fillRect(1  - legAF, -4, 6, 4);
+      b(2, -38 + ARM.fY, 8, 8, P.skin);
+      b(-4, -34 + ARM.fY, 8, 8, P.skin); // Hand backward
+      b(0, -38 + ARM.fY, 4, 6, P.skin);  // Thumb up
+      b(-4, -34 + ARM.fY, 8, 8, P.skin, false); // Seam
+      ctx.fillStyle = P.out; ctx.fillRect(-6, -30 + ARM.fY, 4, 2); // Finger indent left
     }
+
+    // ── LEGS
+    const RUN = [
+      [-8, -6, -8, -6, 2, 2, 1, 0],
+      [-6, -5, -7, -2, 0, 0, -2, 0],
+      [-2, -2, -3, 0, 1, -1, 0, -6],
+      [-5, -4, -6, 0, 2, 2, 1, -2],
+    ];
+    const f = frame % 4;
+    const [lTh, lSh, lFt, lFY, rTh, rSh, rFt, rFY] = RUN[f];
+
+    const drawLeg = (thX, shX, ftX, ftYoff) => {
+      b(thX, -28, 10, 14, c.btm); // pants
+      b(shX, -16, 8, 12, c.btm);
+      b(ftX - 2, -6 + ftYoff, 12, 6, c.shoe);
+      b(ftX - 2, 0 + ftYoff, 12, 2, P.sole, false);
+    };
+
+    const drawSkirtLeg = (thX, shX, ftX, ftYoff) => {
+      // Skirt covers thighs, just draw bare shins
+      b(shX, -20, 8, 16, P.skin);
+      b(ftX - 2, -6 + ftYoff, 12, 6, c.shoe);
+      b(ftX - 2, 0 + ftYoff, 12, 2, P.sole, false);
+    };
+
+    if (gender === 0) { // Male
+      if (f < 2) { drawLeg(lTh, lSh, lFt, lFY); drawLeg(rTh, rSh, rFt, rFY); }
+      else { drawLeg(rTh, rSh, rFt, rFY); drawLeg(lTh, lSh, lFt, lFY); }
+
+      // TORSO
+      b(-6, -52, 16, 26, c.top);
+    } else { // Female
+      if (f < 2) { drawSkirtLeg(lTh, lSh, lFt, lFY); drawSkirtLeg(rTh, rSh, rFt, rFY); }
+      else { drawSkirtLeg(rTh, rSh, rFt, rFY); drawSkirtLeg(lTh, lSh, lFt, lFY); }
+
+      // SKIRT
+      b(-10, -36, 18, 16, c.btm);
+      b(-12, -26, 22, 6, c.btm); // flared hem
+
+      // TORSO
+      b(-6, -52, 16, 20, c.top);
+    }
+
+    // ── NEAR ARM
+    b(-8, -48 + ARM.nY, 10, 10, c.top);
+    if (ARM.nY < 0) {
+      b(-8, -38 + ARM.nY, 8, 8, P.skin);
+      b(0, -42 + ARM.nY, 10, 8, P.skin); // Hand forward
+      b(2, -46 + ARM.nY, 4, 6, P.skin);  // Thumb up
+      b(0, -42 + ARM.nY, 10, 8, P.skin, false); // Seam
+      ctx.fillStyle = P.out; ctx.fillRect(8, -40 + ARM.nY, 4, 2); // Finger indent right
+    } else {
+      b(-10, -38 + ARM.nY, 8, 8, P.skin);
+      b(-16, -34 + ARM.nY, 8, 8, P.skin); // Hand backward
+      b(-12, -38 + ARM.nY, 4, 6, P.skin); // Thumb up
+      b(-16, -34 + ARM.nY, 8, 8, P.skin, false); // Seam
+      ctx.fillStyle = P.out; ctx.fillRect(-22, -30 + ARM.nY, 4, 2); // Finger indent left
+    }
+
+    // ── HEAD
+    if (gender === 0) {
+      drawHeadMale(-6, -52);
+    } else {
+      drawHeadFemale(-6, -52);
+    }
+
     ctx.restore();
   },
 
   drawCat(ctx, x, y, frame, catScheme = 0) {
-    // catScheme: 0=black, 1=white, 2=ginger
+    const P = { out: '#331100' };
     const schemes = [
-      { body: '#222', outline: '#000', detail: '#555', eye: '#aaa' },
-      { body: '#eee', outline: '#aaa', detail: '#fff', eye: '#555' },
-      { body: '#c73', outline: '#853', detail: '#e94', eye: '#222' },
+      { body: '#222222', accent: '#555555', eye: '#FFDD00' }, // Black
+      { body: '#EEEEEE', accent: '#AAAAAA', eye: '#00AAFF' }, // White
+      { body: '#FF8800', accent: '#FFCC00', eye: '#00FF00' }, // Ginger
     ];
     const c = schemes[catScheme];
+
     ctx.save();
     ctx.translate(x, y);
     ctx.imageSmoothingEnabled = false;
+
+    const b = (bx, by, bw, bh, color, out = true) => {
+      if (out) {
+        ctx.fillStyle = P.out;
+        ctx.fillRect(bx - 2, by - 2, bw + 4, bh + 4);
+      }
+      ctx.fillStyle = color;
+      ctx.fillRect(bx, by, bw, bh);
+    };
+
+    const isStretched = (Math.floor(frame) % 2) === 0;
+
+    // Far legs (darker)
+    if (isStretched) {
+      b(-12, -10, 4, 10, c.accent); // far front
+      b(6, -10, 4, 10, c.accent);   // far back
+    } else {
+      b(-8, -10, 4, 10, c.accent);  // far front
+      b(2, -10, 4, 10, c.accent);   // far back
+    }
+
+    const bob = isStretched ? 0 : -2;
+    ctx.translate(0, bob);
+
+    // Tail
+    if (isStretched) {
+      b(12, -18, 12, 4, c.body); // straight
+    } else {
+      b(12, -20, 6, 4, c.body); // curving up
+      b(16, -26, 4, 8, c.body);
+    }
+
     // Body
-    ctx.fillStyle = c.body;
-    ctx.fillRect(-16, -18, 32, 14);
-    ctx.fillStyle = c.outline;
-    ctx.fillRect(-16, -18, 32, 2);
-    ctx.fillRect(-16, -6,  32, 2);
-    ctx.fillRect(-16, -18, 2, 14);
-    ctx.fillRect(14,  -18, 2, 14);
+    b(-10, -20, 22, 12, c.body);
+
+    // Near legs
+    if (isStretched) {
+      b(-16, -10 - bob, 4, 10, c.body); // near front
+      b(10, -10 - bob, 4, 10, c.body);  // near back
+    } else {
+      b(-12, -8 - bob, 4, 8, c.body);   // near front
+      b(4, -8 - bob, 4, 8, c.body);     // near back
+    }
+
     // Head
-    ctx.fillStyle = c.body;
-    ctx.fillRect(10, -22, 14, 12);
-    ctx.fillStyle = c.outline;
-    ctx.fillRect(10, -22, 14, 2);
-    ctx.fillRect(10, -22, 2, 12);
-    ctx.fillRect(22, -22, 2, 12);
-    ctx.fillRect(10, -12, 14, 2);
+    b(-18, -26, 14, 12, c.body);
+
     // Ears
-    ctx.fillStyle = c.detail;
-    ctx.fillRect(11, -26, 4, 4);
-    ctx.fillRect(19, -26, 4, 4);
+    b(-16, -32, 4, 6, c.accent);
+    b(-8, -32, 4, 6, c.accent);
+
     // Eye
-    ctx.fillStyle = c.eye;
-    ctx.fillRect(17, -19, 3, 3);
-    // Tail and legs
-    const tailWag = frame === 0 ? 4 : -4;
-    ctx.fillStyle = c.outline;
-    ctx.fillRect(-18, -14, 4, 8);
-    ctx.fillRect(-22, -14 + tailWag, 4, 4);
-    ctx.fillRect(-8, -4, 4, 8);
-    ctx.fillRect( 0, -4, 4, 8);
-    ctx.fillRect( 8, -4, 4, 8);
+    ctx.fillStyle = P.out; ctx.fillRect(-16, -24, 4, 4); // Eye outline
+    b(-14, -22, 2, 2, c.eye, false); // Pupil/iris
+
+    // Nose
+    b(-20, -18, 2, 2, '#FFAAAA', false);
+
     ctx.restore();
   },
 
@@ -659,7 +526,7 @@ const Art = {
     // ── Rotor blur discs (faint, behind everything) ──
     ctx.fillStyle = 'rgba(160,160,160,0.10)';
     ctx.fillRect(-46, -16, 26, 8);   // left disc
-    ctx.fillRect(20,  -16, 26, 8);   // right disc
+    ctx.fillRect(20, -16, 26, 8);   // right disc
 
     // ── Horizontal arm booms ──
     ctx.fillStyle = '#383838';
@@ -668,22 +535,22 @@ const Art = {
     // ── Motor pods at arm tips ──
     ctx.fillStyle = '#222';
     ctx.fillRect(-38, -11, 10, 10);  // left pod
-    ctx.fillRect(28,  -11, 10, 10);  // right pod
+    ctx.fillRect(28, -11, 10, 10);  // right pod
     ctx.fillStyle = '#484848';
     ctx.fillRect(-36, -10, 6, 5);    // left pod top sheen
-    ctx.fillRect(30,  -10, 6, 5);    // right pod top sheen
+    ctx.fillRect(30, -10, 6, 5);    // right pod top sheen
 
     // ── Rotor blades (animated) ──
     if (spin) {
       // Full horizontal span visible
       ctx.fillStyle = '#777';
       ctx.fillRect(-50, -13, 24, 3); // left blade pair
-      ctx.fillRect(26,  -13, 24, 3); // right blade pair
+      ctx.fillRect(26, -13, 24, 3); // right blade pair
     } else {
       // Blades rotated 45° — appear as shorter thicker bar
       ctx.fillStyle = '#666';
       ctx.fillRect(-46, -15, 16, 7); // left
-      ctx.fillRect(30,  -15, 16, 7); // right
+      ctx.fillRect(30, -15, 16, 7); // right
     }
 
     // ── Main body shell ──
@@ -717,9 +584,9 @@ const Art = {
     // ── Landing gear ──
     ctx.fillStyle = '#2a2a2a';
     ctx.fillRect(-8, 19, 3, 6);      // left strut
-    ctx.fillRect(5,  19, 3, 6);      // right strut
+    ctx.fillRect(5, 19, 3, 6);      // right strut
     ctx.fillRect(-11, 24, 8, 2);     // left skid
-    ctx.fillRect(4,   24, 8, 2);     // right skid
+    ctx.fillRect(4, 24, 8, 2);     // right skid
 
     // ── Status LED (blinks green) ──
     ctx.fillStyle = frame % 4 < 2 ? '#00ee00' : '#004400';
@@ -731,23 +598,33 @@ const Art = {
   drawBuilding(ctx, x, y, w, h) {
     ctx.save();
     ctx.imageSmoothingEnabled = false;
-    ctx.fillStyle = '#fff';
+    ctx.fillStyle = '#16202B'; // deep navy silhouette
     ctx.fillRect(x, y, w, h);
-    ctx.fillStyle = '#e0e0e0';
-    ctx.fillRect(x, y, w, 1);
-    ctx.fillRect(x, y, 1, h);
-    ctx.fillRect(x + w - 1, y, 1, h);
+    ctx.fillStyle = '#0B121A';
+    ctx.fillRect(x + w - 4, y, 4, h); // side shadow
+
     const cols = Math.max(1, Math.floor(w / 16));
     const rows = Math.max(1, Math.floor(h / 22));
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         const wx = x + 6 + c * 16;
         const wy = y + 8 + r * 22;
-        if (wx + 8 < x + w - 2 && wy + 12 < y + h - 2) {
-          ctx.fillStyle = (r + c) % 2 === 0 ? '#ddd' : '#eee';
-          ctx.fillRect(wx, wy, 8, 10);
+        if (wx + 8 < x + w - 4 && wy + 12 < y + h - 2) {
+          // Semi-random lit windows based on building dims and window index to prevent blinking
+          const hash = Math.sin((w + c) * 12.9898 + (h + r) * 78.233) * 43758.5453;
+          if (hash - Math.floor(hash) > 0.6) {
+            ctx.fillStyle = (r + c) % 3 === 0 ? '#FF8C00' : '#FFD700'; // warm orange or golden
+            ctx.fillRect(wx, wy, 8, 10);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(wx + 2, wy + 2, 4, 4); // intense center
+          }
         }
       }
+    }
+    // Red beacon on top if very tall
+    if (h > 120) {
+      ctx.fillStyle = '#ff2020';
+      ctx.fillRect(x + Math.floor(w / 2), y - 4, 3, 4);
     }
     ctx.restore();
   },
@@ -755,14 +632,14 @@ const Art = {
   drawPalmTree(ctx, x, y, h) {
     ctx.save();
     ctx.imageSmoothingEnabled = false;
-    ctx.fillStyle = '#bbb';
+    ctx.fillStyle = '#0D1A2B'; // night silhouette
     for (let i = 0; i < h; i += 4) {
       const off = Math.round(Math.sin(i * 0.06) * 2);
       ctx.fillRect(x + off, y - i - 4, 4, 4);
     }
     const tx = x + Math.round(Math.sin(h * 0.06) * 2), ty = y - h;
-    const fronds = [[-24,-10],[-14,-18],[0,-20],[14,-18],[24,-8],[16,2],[-12,2]];
-    ctx.fillStyle = '#aaa';
+    const fronds = [[-24, -10], [-14, -18], [0, -20], [14, -18], [24, -8], [16, 2], [-12, 2]];
+    ctx.fillStyle = '#060C14'; // very dark fronds
     fronds.forEach(([dx, dy]) => {
       const steps = Math.max(Math.abs(dx), Math.abs(dy)) / 4;
       for (let s = 0; s <= steps; s++) {
@@ -778,34 +655,42 @@ const Art = {
   drawMakolet(ctx, x, y) {
     ctx.save();
     ctx.imageSmoothingEnabled = false;
-    ctx.fillStyle = '#000';
+    ctx.fillStyle = '#08101A'; // dark alley wall
     ctx.fillRect(x, y - 60, 80, 60);
-    ctx.fillStyle = '#fff';
+    ctx.fillStyle = '#0E1B2E'; // front wall - painted white in day, now grey in dark
     ctx.fillRect(x + 2, y - 58, 76, 56);
-    // Roof outline (dark stroke)
-    ctx.fillStyle = '#333';
+    // Roof outline
+    ctx.fillStyle = '#0B1524';
     ctx.fillRect(x - 6, y - 70, 92, 14);
-    // Black-and-white striped roof
-    ctx.fillStyle = '#000';
+    // Dark awning
+    ctx.fillStyle = '#060B14';
     ctx.fillRect(x - 4, y - 68, 88, 12);
-    ctx.fillStyle = '#fff';
+    ctx.fillStyle = '#1A2A44';
     for (let i = 0; i < 8; i++) {
       if (i % 2 === 0) ctx.fillRect(x - 4 + i * 11, y - 68, 11, 12);
     }
-    ctx.fillStyle = '#000';
+    // Main bright shop window (glowing)
+    ctx.fillStyle = '#FFB84D'; // bright warm interior light
     ctx.fillRect(x + 28, y - 36, 24, 36);
-    ctx.fillStyle = '#888';
+    ctx.fillStyle = '#FF8800';
     ctx.fillRect(x + 30, y - 34, 20, 32);
-    ctx.fillStyle = '#000';
+    // Items inside window (silhouettes)
+    ctx.fillStyle = '#2E1200';
+    ctx.fillRect(x + 32, y - 10, 16, 10);
+    ctx.fillRect(x + 36, y - 20, 8, 10);
     ctx.fillRect(x + 46, y - 18, 4, 4);
+    // glowing sign box MKLT
+    ctx.fillStyle = '#FF6600'; // bright neon orange
     ctx.fillRect(x + 6, y - 56, 22, 12);
-    ctx.fillStyle = '#fff';
+    ctx.fillStyle = '#FFAA00';
     ctx.fillRect(x + 7, y - 55, 20, 10);
-    ctx.fillStyle = '#000';
+    ctx.fillStyle = '#662200';
     ctx.font = 'bold 7px monospace';
     ctx.fillText('MKLT', x + 44, y - 44);
+
+    // secondary dark window
     ctx.fillRect(x + 50, y - 56, 22, 14);
-    ctx.fillStyle = '#aaa';
+    ctx.fillStyle = '#09101C';
     ctx.fillRect(x + 52, y - 54, 18, 10);
     ctx.restore();
   },
@@ -813,30 +698,36 @@ const Art = {
   drawBuildingBauhaus(ctx, x, y, w, h) {
     ctx.save();
     ctx.imageSmoothingEnabled = false;
-    // White body
-    ctx.fillStyle = '#fff';
+    ctx.fillStyle = '#1A283C'; // dark gray body -> dark navy
     ctx.fillRect(x, y, w, h);
-    // Thin outline
-    ctx.fillStyle = '#ddd';
-    ctx.fillRect(x, y, w, 1);
-    ctx.fillRect(x, y, 1, h);
-    ctx.fillRect(x + w - 1, y, 1, h);
-    // Horizontal ribbon windows (Bauhaus hallmark)
+
+    // Horizontal ribbon windows (glowing)
     const bandH = 5;
     const bandGap = 13;
+    let floorIdx = 0;
     for (let by = y + 9; by + bandH < y + h - 5; by += bandH + bandGap) {
-      ctx.fillStyle = '#ddd';
+      const hash = Math.sin(w * 12.9898 + (h + floorIdx) * 78.233) * 43758.5453;
+      const lit = (hash - Math.floor(hash) > 0.3); // 70% chance entire floor is lit
+
+      ctx.fillStyle = lit ? '#FFB000' : '#0F1A28';
       ctx.fillRect(x + 3, by, w - 6, bandH);
+
+      if (lit) {
+        ctx.fillStyle = '#FFE3AF';
+        ctx.fillRect(x + 3, by + 1, w - 6, 2); // core glow
+      }
+      floorIdx++;
+
       // Vertical mullions dividing ribbon
-      ctx.fillStyle = '#eee';
+      ctx.fillStyle = '#1A283C';
       const divs = Math.max(2, Math.floor(w / 14));
       const divStep = Math.floor((w - 6) / divs);
       for (let d = 1; d < divs; d++) {
-        ctx.fillRect(x + 3 + d * divStep, by, 1, bandH);
+        ctx.fillRect(x + 3 + d * divStep, by, 2, bandH);
       }
     }
     // Flat roof cap
-    ctx.fillStyle = '#eee';
+    ctx.fillStyle = '#142030';
     ctx.fillRect(x - 2, y - 3, w + 4, 4);
     ctx.restore();
   },
@@ -844,29 +735,34 @@ const Art = {
   drawBuildingBrutal(ctx, x, y, w, h) {
     ctx.save();
     ctx.imageSmoothingEnabled = false;
-    // Light concrete body
-    ctx.fillStyle = '#ddd';
+    ctx.fillStyle = '#162235'; // very dark concrete
     ctx.fillRect(x, y, w, h);
-    ctx.fillStyle = '#ccc';
-    ctx.fillRect(x + 1, y + 1, w - 2, h - 2);
-    // Horizontal floor slabs protruding
+    // Deep shadows under protruding slabs
     const floorH = 18;
+    let floorIdx = 0;
     for (let fy = y + floorH; fy < y + h; fy += floorH) {
-      ctx.fillStyle = '#bbb';
-      ctx.fillRect(x - 4, fy - 2, w + 8, 3);
-      // Balcony openings above each slab
+      ctx.fillStyle = '#0D1522'; // underside shadow
+      ctx.fillRect(x - 2, fy, w + 4, 4);
+      ctx.fillStyle = '#1B2A40'; // slab top edge catching ambient light
+      ctx.fillRect(x - 4, fy - 2, w + 8, 2);
+
+      // Balcony openings (some lit)
       const cols = Math.max(1, Math.floor((w - 4) / 14));
       const colStep = Math.floor((w - 4) / cols);
-      ctx.fillStyle = '#bbb';
       for (let c = 0; c < cols; c++) {
         const bx = x + 3 + c * colStep;
         if (bx + 8 <= x + w - 2) {
-          ctx.fillRect(bx, fy - floorH + 4, 8, 8);
-          ctx.fillStyle = '#ccc';
-          ctx.fillRect(bx + 1, fy - floorH + 5, 6, 6);
-          ctx.fillStyle = '#bbb';
+          const hash = Math.sin((w + c) * 1.9 + (h + floorIdx) * 7.2) * 43758.5;
+          if (hash - Math.floor(hash) > 0.7) {
+            ctx.fillStyle = '#FF7F00'; // dull orange interior glow
+            ctx.fillRect(bx, fy - floorH + 4, 8, 8);
+          } else {
+            ctx.fillStyle = '#090E17'; // deep unlit balcony
+            ctx.fillRect(bx, fy - floorH + 4, 8, 8);
+          }
         }
       }
+      floorIdx++;
     }
     ctx.restore();
   },
@@ -874,134 +770,263 @@ const Art = {
   drawBuildingGlass(ctx, x, y, w, h) {
     ctx.save();
     ctx.imageSmoothingEnabled = false;
-    // Light glass body
-    ctx.fillStyle = '#ccc';
+    ctx.fillStyle = '#0F1E33'; // dark blue glass
     ctx.fillRect(x, y, w, h);
-    // Window grid — deterministic lit pattern
-    const winW = 5, winH = 4, gapX = 3, gapY = 5;
-    const cols = Math.floor((w - 6) / (winW + gapX));
-    const rows = Math.floor((h - 8) / (winH + gapY));
+
+    // Dense window grid
+    const winW = 5, winH = 4, gapX = 2, gapY = 3;
+    const cols = Math.floor((w - 4) / (winW + gapX));
+    const rows = Math.floor((h - 4) / (winH + gapY));
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
-        const lit = (r * 3 + c * 2) % 5 !== 0;
-        ctx.fillStyle = lit ? '#fff' : '#ddd';
-        const wx = x + 4 + c * (winW + gapX);
-        const wy = y + 5 + r * (winH + gapY);
-        ctx.fillRect(wx, wy, winW, winH);
+        const hash = Math.sin((w + c) * 12.98 + (h + r) * 78.23) * 4375.54;
+        const fract = hash - Math.floor(hash);
+        if (fract > 0.4) {
+          ctx.fillStyle = fract > 0.8 ? '#ffffff' : (fract > 0.6 ? '#FF9900' : '#182C4A');
+          const wx = x + 3 + c * (winW + gapX);
+          const wy = y + 4 + r * (winH + gapY);
+          ctx.fillRect(wx, wy, winW, winH);
+        }
       }
     }
     // Antenna
     const ax = x + Math.floor(w / 2) - 1;
-    ctx.fillStyle = '#ccc';
+    ctx.fillStyle = '#111';
     ctx.fillRect(ax, y - 14, 2, 14);
-    ctx.fillRect(ax - 5, y - 12, 12, 2);
+    ctx.fillStyle = '#ff0000'; // red aviation light
+    ctx.fillRect(ax, y - 16, 2, 2);
     ctx.restore();
   },
 
   drawBuildingOldCity(ctx, x, y, w, h) {
     ctx.save();
     ctx.imageSmoothingEnabled = false;
-    // Bright Jerusalem stone body
-    ctx.fillStyle = '#eee';
+    ctx.fillStyle = '#1C2A3D'; // dark sandstone
     ctx.fillRect(x, y, w, h);
-    ctx.fillStyle = '#ddd';
-    ctx.fillRect(x, y, w, 1);
-    ctx.fillRect(x, y, 1, h);
-    ctx.fillRect(x + w - 1, y, 1, h);
-    // Arched windows (rect body + stepped arch top)
-    const winW = 8, spacing = 14;
+    ctx.fillStyle = '#121E2E'; // shadows
+    ctx.fillRect(x + w - 4, y, 4, h);
+
+    const winW = 8, spacing = 16;
     const cols = Math.max(1, Math.floor((w - 8) / spacing));
     const rows = Math.max(1, Math.floor(h / 26));
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
-        const wx = x + 5 + c * spacing;
+        const wx = x + 6 + c * spacing;
         const wy = y + 8 + r * 26;
-        if (wx + winW > x + w - 3 || wy + 18 > y + h - 3) continue;
-        ctx.fillStyle = '#ccc';
+        if (wx + winW > x + w - 4 || wy + 18 > y + h - 3) continue;
+
+        const hash = Math.sin((w + c) * 2.1 + (h + r) * 3.4) * 4375.5;
+        const lit = hash - Math.floor(hash) > 0.4;
+
+        ctx.fillStyle = lit ? '#FF8C00' : '#0B121C'; // warm arched glow
         ctx.fillRect(wx, wy + 6, winW, 10);
         ctx.fillRect(wx + 1, wy + 3, winW - 2, 4);
         ctx.fillRect(wx + 2, wy, winW - 4, 4);
+
+        if (lit) {
+          ctx.fillStyle = '#FFD700'; // bright center
+          ctx.fillRect(wx + 2, wy + 6, winW - 4, 6);
+        }
       }
     }
-    // Dome on top if building is wide enough
+    // Dome
     if (w >= 38) {
       const dc = x + Math.floor(w / 2);
-      ctx.fillStyle = '#eee';
+      ctx.fillStyle = '#FF9900'; // glowing gold dome
       ctx.fillRect(dc - 10, y - 12, 20, 12);
-      ctx.fillRect(dc - 8,  y - 16, 16, 6);
-      ctx.fillRect(dc - 5,  y - 19, 10, 4);
-      ctx.fillRect(dc - 2,  y - 21, 4,  3);
-      ctx.fillStyle = '#ddd';
-      ctx.fillRect(dc - 1,  y - 22, 2,  2);
+      ctx.fillRect(dc - 8, y - 16, 16, 6);
+      ctx.fillRect(dc - 5, y - 19, 10, 4);
+      ctx.fillRect(dc - 2, y - 21, 4, 3);
+      ctx.fillStyle = '#CC5500'; // shading
+      ctx.fillRect(dc + 2, y - 12, 8, 12);
     }
+    ctx.restore();
+  },
+
+  drawAzrieliCircle(ctx, x, y, h) {
+    ctx.save();
+    ctx.imageSmoothingEnabled = false;
+    const w = 40;
+    ctx.fillStyle = '#0C182B'; // dark glass cylinder
+    ctx.fillRect(x, y, w, h);
+    ctx.fillStyle = '#142847'; // curved specular highlight
+    ctx.fillRect(x + 6, y, 8, h);
+
+    // Windows matching the grid pattern of Azrieli
+    for (let wy = y + 4; wy < y + h; wy += 6) {
+      const fIdx = wy - y;
+      ctx.fillStyle = '#FFAA00';
+      const r1 = Math.sin(fIdx * 1.1) * 1000; const f1 = r1 - Math.floor(r1);
+      const r2 = Math.sin(fIdx * 2.2) * 1000; const f2 = r2 - Math.floor(r2);
+      if (f1 > 0.5) ctx.fillRect(x + 2, wy, 4, 4);
+      if (f2 > 0.2) ctx.fillRect(x + 8, wy, 4, 4);
+      if ((f1 + f2) % 1.0 > 0.2) ctx.fillRect(x + 14, wy, 4, 4);
+      if (f1 > 0.8) ctx.fillRect(x + 22, wy, 4, 4);
+      if (f2 > 0.8) ctx.fillRect(x + 28, wy, 4, 4);
+    }
+    ctx.restore();
+  },
+
+  drawAzrieliTriangle(ctx, x, y, h) {
+    ctx.save();
+    ctx.imageSmoothingEnabled = false;
+    const w = 44;
+    // angled face (front), side face (right)
+    ctx.fillStyle = '#0C182B';
+    ctx.fillRect(x, y, 28, h);
+    ctx.fillStyle = '#08101C'; // shaded side
+    ctx.fillRect(x + 28, y, 16, h);
+
+    for (let wy = y + 4; wy < y + h; wy += 8) {
+      const f1 = Math.sin((wy - y) * 3.3) * 1000;
+      if (f1 - Math.floor(f1) > 0.3) {
+        ctx.fillStyle = '#FFD700';
+        ctx.fillRect(x + 6, wy, 16, 4); // lit strip
+      }
+      const f2 = Math.sin((wy - y) * 4.4) * 1000;
+      if (f2 - Math.floor(f2) > 0.6) {
+        ctx.fillStyle = '#FF8800';
+        ctx.fillRect(x + 32, wy, 8, 4); // dimly lit strip on shadow side
+      }
+    }
+    // angled roof profile
+    ctx.fillStyle = '#0C182B';
+    ctx.fillRect(x + 4, y - 4, 24, 4);
+    ctx.fillRect(x + 8, y - 8, 20, 4);
+    ctx.restore();
+  },
+
+  drawAzrieliSquare(ctx, x, y, h) {
+    ctx.save();
+    ctx.imageSmoothingEnabled = false;
+    const w = 36;
+    ctx.fillStyle = '#0D1829';
+    ctx.fillRect(x, y, w, h);
+
+    for (let wy = y + 5; wy < y + h; wy += 7) {
+      for (let wx = x + 4; wx < x + w - 4; wx += 6) {
+        const f1 = Math.sin((wx - x) * 5.5 + (wy - y) * 6.6) * 1000;
+        if (f1 - Math.floor(f1) > 0.4) {
+          ctx.fillStyle = '#FF9900';
+          ctx.fillRect(wx, wy, 4, 5);
+        }
+      }
+    }
+    // offset roof cube characteristic of the structure
+    ctx.fillStyle = '#0A111F';
+    ctx.fillRect(x + 6, y - 10, 24, 10);
+    // red beacon
+    ctx.fillStyle = '#ff0000';
+    ctx.fillRect(x + 16, y - 14, 4, 4);
+    ctx.restore();
+  },
+
+  drawReadingChimney(ctx, x, y, h) {
+    ctx.save();
+    ctx.imageSmoothingEnabled = false;
+    const w = 16;
+    // The iconic striped chimney of Reading Power Station
+    ctx.fillStyle = '#101A29'; // painted stripes are very dark in the night
+    ctx.fillRect(x, y, w, h);
+
+    // Light stripes
+    for (let wy = y + 10; wy < y + h; wy += 40) {
+      ctx.fillStyle = '#1A2A40'; // off-white stripes at night
+      ctx.fillRect(x, wy, w, 20);
+    }
+
+    // Cylindrical shading
+    ctx.fillStyle = '#0A0F17';
+    ctx.fillRect(x + 12, y, 4, h); // right shadow
+
+    // Base building
+    ctx.fillStyle = '#0E1724';
+    ctx.fillRect(x - 20, y + h - 40, 56, 40);
+    ctx.fillStyle = '#1A2A40';
+    // Industrial lit windows
+    for (let wx = x - 16; wx < x + 30; wx += 10) {
+      const f1 = Math.sin((wx - x) * 7.7) * 1000;
+      if (f1 - Math.floor(f1) > 0.5) {
+        ctx.fillStyle = '#FF8800'; // sodium glow
+        ctx.fillRect(wx, y + h - 30, 6, 8);
+        ctx.fillRect(wx, y + h - 16, 6, 8);
+      }
+    }
+    // Red pulsing beacon at top
+    // Fixed color so it doesn't blink randomly per frame
+    ctx.fillStyle = '#bf0000';
+    ctx.fillRect(x + 2, y - 4, 12, 4); // beacon
     ctx.restore();
   },
 
   drawFicusTree(ctx, x, y) {
     ctx.save();
     ctx.imageSmoothingEnabled = false;
-    // Thick short trunk
-    ctx.fillStyle = '#bbb';
+    // Thick short trunk (dark silhouette)
+    ctx.fillStyle = '#0b0e0c';
     ctx.fillRect(x - 7, y - 28, 14, 28);
-    ctx.fillStyle = '#aaa';
+    ctx.fillStyle = '#080a08';
     ctx.fillRect(x - 5, y - 26, 10, 24);
     // Root spread
-    ctx.fillStyle = '#bbb';
+    ctx.fillStyle = '#0b0e0c';
     ctx.fillRect(x - 13, y - 8, 8, 8);
-    ctx.fillRect(x + 5,  y - 8, 8, 8);
-    // Canopy — wide and bushy, 3 layers
-    ctx.fillStyle = '#ccc';
+    ctx.fillRect(x + 5, y - 8, 8, 8);
+    // Canopy — wide and bushy
+    ctx.fillStyle = '#0a0d0a';
     ctx.fillRect(x - 34, y - 54, 68, 30);
-    ctx.fillStyle = '#ddd';
+    ctx.fillStyle = '#111511';
     ctx.fillRect(x - 32, y - 52, 64, 26);
-    ctx.fillStyle = '#ccc';
+    ctx.fillStyle = '#0a0d0a';
     ctx.fillRect(x - 24, y - 76, 48, 26);
-    ctx.fillStyle = '#ddd';
+    ctx.fillStyle = '#111511';
     ctx.fillRect(x - 22, y - 74, 44, 22);
-    ctx.fillStyle = '#ccc';
+    ctx.fillStyle = '#0a0d0a';
     ctx.fillRect(x - 14, y - 92, 28, 20);
-    ctx.fillStyle = '#ddd';
+    ctx.fillStyle = '#111511';
     ctx.fillRect(x - 12, y - 90, 24, 16);
     // Leaf texture hints
-    ctx.fillStyle = '#bbb';
+    ctx.fillStyle = '#080a08';
     ctx.fillRect(x - 28, y - 56, 10, 6);
-    ctx.fillRect(x + 18,  y - 52, 10, 6);
-    ctx.fillRect(x - 8,   y - 78, 10, 6);
+    ctx.fillRect(x + 18, y - 52, 10, 6);
+    ctx.fillRect(x - 8, y - 78, 10, 6);
     ctx.restore();
   },
 
   drawBusStop(ctx, x, y) {
     ctx.save();
     ctx.imageSmoothingEnabled = false;
-    // Roof
-    ctx.fillStyle = '#222';
+    // Roof (dark)
+    ctx.fillStyle = '#0B1324';
     ctx.fillRect(x - 2, y - 68, 54, 5);
-    ctx.fillStyle = '#444';
-    ctx.fillRect(x,     y - 66, 52, 3);
+    ctx.fillStyle = '#060D1A';
+    ctx.fillRect(x, y - 66, 52, 3);
     // Left post
-    ctx.fillStyle = '#333';
+    ctx.fillStyle = '#0E1A2B';
     ctx.fillRect(x + 2, y - 63, 4, 63);
     // Right post
     ctx.fillRect(x + 44, y - 63, 4, 63);
-    // Back glass panel (light gray)
-    ctx.fillStyle = '#bbb';
+
+    // Glowing backlit ad panel (cyan/white glow -> warm orange)
+    ctx.fillStyle = '#FF7F00';
     ctx.fillRect(x + 6, y - 62, 2, 55);
-    ctx.fillStyle = '#ccc';
+    ctx.fillStyle = '#FFAA00';
     ctx.fillRect(x + 8, y - 62, 2, 55);
-    // Bench
-    ctx.fillStyle = '#444';
+
+    // Bench (dark silhouette against the glowing panel)
+    ctx.fillStyle = '#040914';
     ctx.fillRect(x + 6, y - 24, 36, 4);
-    ctx.fillStyle = '#333';
-    ctx.fillRect(x + 8,  y - 20, 3, 20);
+    ctx.fillStyle = '#02040A';
+    ctx.fillRect(x + 8, y - 20, 3, 20);
     ctx.fillRect(x + 37, y - 20, 3, 20);
+
     // Route sign on pole
-    ctx.fillStyle = '#111';
+    ctx.fillStyle = '#0B1324';
     ctx.fillRect(x + 52, y - 80, 3, 80);
-    ctx.fillStyle = '#222';
+    ctx.fillStyle = '#FF9900'; // glowing yellow neon route sign
     ctx.fillRect(x + 48, y - 92, 18, 16);
-    ctx.fillStyle = '#eee';
+    ctx.fillStyle = '#FFCC00';
     ctx.fillRect(x + 49, y - 91, 16, 14);
-    ctx.fillStyle = '#000';
+    ctx.fillStyle = '#02040A';
     ctx.font = 'bold 5px monospace';
     ctx.fillText('BUS', x + 50, y - 82);
     ctx.restore();
@@ -1010,31 +1035,31 @@ const Art = {
   drawBillboard(ctx, x, y) {
     ctx.save();
     ctx.imageSmoothingEnabled = false;
-    // Support poles
-    ctx.fillStyle = '#444';
+    // Support poles (dark)
+    ctx.fillStyle = '#08101C';
     ctx.fillRect(x + 10, y - 110, 5, 110);
     ctx.fillRect(x + 65, y - 110, 5, 110);
     // Cross brace
-    ctx.fillStyle = '#333';
+    ctx.fillStyle = '#060C14';
     ctx.fillRect(x + 13, y - 80, 54, 3);
     // Sign backing
-    ctx.fillStyle = '#111';
+    ctx.fillStyle = '#04080F';
     ctx.fillRect(x - 2, y - 122, 84, 50);
-    // Sign face
-    ctx.fillStyle = '#eee';
-    ctx.fillRect(x,     y - 120, 80, 46);
-    // Abstract ad content
-    ctx.fillStyle = '#222';
+    // Glowing backlit sign face
+    ctx.fillStyle = '#FF6600'; // soft neon white
+    ctx.fillRect(x, y - 120, 80, 46);
+    // Abstract ad content (dark silhouettes against glow)
+    ctx.fillStyle = '#331100'; // deep ink
     ctx.fillRect(x + 4, y - 116, 44, 7);  // headline
     ctx.fillRect(x + 4, y - 106, 28, 4);  // subline
-    ctx.fillRect(x + 4, y - 98,  34, 4);  // subline 2
-    ctx.fillRect(x + 4, y - 88,  20, 4);  // subline 3
-    // Right side image block
-    ctx.fillStyle = '#888';
+    ctx.fillRect(x + 4, y - 98, 34, 4);  // subline 2
+    ctx.fillRect(x + 4, y - 88, 20, 4);  // subline 3
+    // Right side image block (vibrant neon photo abstract)
+    ctx.fillStyle = '#FF8800'; // neon magenta
     ctx.fillRect(x + 52, y - 116, 24, 38);
-    ctx.fillStyle = '#aaa';
+    ctx.fillStyle = '#FFCC00'; // neon cyan
     ctx.fillRect(x + 54, y - 114, 20, 34);
-    ctx.fillStyle = '#555';
+    ctx.fillStyle = '#662200'; // dark figure
     ctx.fillRect(x + 56, y - 108, 12, 16);
     ctx.restore();
   },
@@ -1045,65 +1070,63 @@ const Art = {
     ctx.rotate(angle); // pivots around feet; π/2 = lying flat on ground
     ctx.imageSmoothingEnabled = false;
 
+    // Same palette as drawPlayer
     const C = {
-      cap: '#6b7a30', capDk: '#4a5520', capBrim: '#5a6828',
-      hair: '#1c1208',
-      skin: '#d4c4a8', skinDk: '#b8a070',
-      shirt: '#e8e8e4', shirtDk: '#c0c0bc',
-      pants: '#7a7c48', pantsDk: '#585a30',
-      shoe: '#201810', sole: '#e8e8e4',
+      out: '#331100',
+      cap: '#FF6A00',
+      hair: '#803300',
+      skin: '#FFB86C',
+      shirt: '#FFE3AF',
+      pants: '#B34700',
+      shoe: '#4A1D00', sole: '#FFCA80',
     };
 
-    // Legs
-    ctx.fillStyle = C.pants;
-    ctx.fillRect(-7, -28, 7, 28);
-    ctx.fillRect(1,  -28, 7, 28);
-    ctx.fillStyle = C.pantsDk;
-    ctx.fillRect(-7, -28, 3, 28);
-    ctx.fillRect(1,  -28, 3, 28);
-    ctx.fillStyle = C.shoe;
-    ctx.fillRect(-9,  -2, 11, 6);
-    ctx.fillRect(0,   -2, 11, 6);
-    ctx.fillStyle = C.sole;
-    ctx.fillRect(-9,   3, 11, 2);
-    ctx.fillRect(0,    3, 11, 2);
+    // Helper to draw blocky pixel shapes with thick borders
+    const b = (bx, by, bw, bh, color, out = true) => {
+      if (out) {
+        ctx.fillStyle = C.out;
+        ctx.fillRect(bx - 2, by - 2, bw + 4, bh + 4);
+      }
+      ctx.fillStyle = color;
+      ctx.fillRect(bx, by, bw, bh);
+    };
 
-    // Body
-    ctx.fillStyle = C.shirt;
-    ctx.fillRect(-6, -54, 16, 26);
-    ctx.fillStyle = C.shirtDk;
-    ctx.fillRect(-6, -54, 5, 26);
+    // Back Arm spread wide and up
+    b(-22, -48, 14, 8, C.shirt);
+    b(-30, -46, 8, 8, C.skin); // Hand
 
-    // Arms spread wide
-    ctx.fillStyle = C.shirt;
-    ctx.fillRect(-22, -50, 16, 7);
-    ctx.fillRect(10,  -50, 16, 7);
-    ctx.fillStyle = C.skin;
-    ctx.fillRect(-22, -44, 14, 5);
-    ctx.fillRect(10,  -44, 14, 5);
+    // Back leg spread backward
+    b(-14, -28, 10, 24, C.pants);
+    b(-16, -4, 12, 6, C.shoe); b(-16, 2, 12, 2, C.sole, false);
+
+    // Front leg spread forward
+    b(2, -28, 10, 24, C.pants);
+    b(4, -4, 12, 6, C.shoe); b(4, 2, 12, 2, C.sole, false);
+
+    // Torso
+    b(-6, -54, 16, 26, C.shirt);
+
+    // Front arm spread wide and down
+    b(10, -44, 14, 8, C.shirt);
+    b(24, -42, 8, 8, C.skin); // Hand
 
     // Head
-    ctx.fillStyle = C.skin;
-    ctx.fillRect(-9, -68, 18, 15);
-    ctx.fillStyle = C.hair;
-    ctx.fillRect(-2, -57, 11, 5);            // beard
+    const hx = -6, hy = -54;
+    b(hx, hy - 14, 14, 14, C.skin); // Face
+    b(hx + 14, hy - 10, 4, 4, C.skin); // Nose
+    b(hx, hy - 14, 14, 14, C.skin, false); // Seamless Face Fill
+    b(hx, hy - 6, 12, 6, C.hair, false); // Beard/Jaw
+    b(hx + 10, hy - 8, 4, 4, C.hair, false); // Mustache/Cheek
 
-    // X eyes (knocked out)
-    ctx.fillStyle = '#111';
-    // Left X
-    ctx.fillRect(-4, -67, 2, 2); ctx.fillRect(-2, -65, 2, 2); ctx.fillRect(0,  -63, 2, 2);
-    ctx.fillRect(0,  -67, 2, 2);             ctx.fillRect(-4, -63, 2, 2);
-    // Right X
-    ctx.fillRect(4,  -67, 2, 2); ctx.fillRect(6,  -65, 2, 2); ctx.fillRect(8,  -63, 2, 2);
-    ctx.fillRect(8,  -67, 2, 2);             ctx.fillRect(4,  -63, 2, 2);
+    // X eye (knocked out, shown in profile)
+    ctx.fillStyle = C.out;
+    ctx.fillRect(hx + 6, hy - 13, 2, 2); ctx.fillRect(hx + 10, hy - 13, 2, 2);
+    ctx.fillRect(hx + 8, hy - 11, 2, 2);
+    ctx.fillRect(hx + 6, hy - 9, 2, 2); ctx.fillRect(hx + 10, hy - 9, 2, 2);
 
-    // Cap (knocked askew)
-    ctx.fillStyle = C.cap;
-    ctx.fillRect(-10, -78, 21, 11);
-    ctx.fillStyle = C.capDk;
-    ctx.fillRect(-10, -78, 7, 11);
-    ctx.fillStyle = C.capBrim;
-    ctx.fillRect(10, -69, 14, 4);
+    // Cap (knocked askew, floating off the head)
+    b(hx - 14, hy - 24, 16, 10, C.cap); // Dome
+    b(hx - 14 + 14, hy - 18, 12, 4, C.cap);  // Brim
 
     ctx.restore();
   },
@@ -1129,12 +1152,12 @@ const Art = {
 
         const t = dist / curR; // 0 = center, 1 = edge
         let color;
-        if      (t < 0.18) color = '#fff';
+        if (t < 0.18) color = '#fff';
         else if (t < 0.34) color = '#ff0';
         else if (t < 0.52) color = '#fa0';
         else if (t < 0.68) color = '#f60';
         else if (t < 0.82) color = '#f00';
-        else               color = '#900';
+        else color = '#900';
 
         ctx.fillStyle = color;
         ctx.fillRect(Math.round(cx + dx), Math.round(cy + dy), pix, pix);
@@ -1150,14 +1173,14 @@ const Art = {
     ctx.imageSmoothingEnabled = false;
 
     const totalDist = fromY - toY; // positive — rising upward
-    const amplitude  = 40;         // horizontal S-curve swing ±px
+    const amplitude = 40;         // horizontal S-curve swing ±px
 
     // Current tip position (follows the S-curve)
-    const tipY   = fromY - totalDist * progress;
-    const xAtVt  = vt => Math.round(baseX + amplitude * Math.sin(vt * Math.PI * 2));
+    const tipY = fromY - totalDist * progress;
+    const xAtVt = vt => Math.round(baseX + amplitude * Math.sin(vt * Math.PI * 2));
 
     // Trail segments descend from tip toward launch point
-    const PALETTE = ['#fff','#ff0','#ff0','#fa0','#fa0','#f60','#f60','#f00','#c00','#900','#600','#300'];
+    const PALETTE = ['#fff', '#ff0', '#ff0', '#fa0', '#fa0', '#f60', '#f60', '#f00', '#c00', '#900', '#600', '#300'];
     const STEP = 4;
 
     for (let i = 0; i < PALETTE.length; i++) {
@@ -1165,7 +1188,7 @@ const Art = {
       if (sy >= fromY) break;                          // don't draw below launch
       const vt = (fromY - sy) / totalDist;             // 0 at launch, 1 at target
       const sx = xAtVt(vt);
-      const w  = Math.max(2, 5 - Math.floor(i / 3));  // narrows toward back
+      const w = Math.max(2, 5 - Math.floor(i / 3));  // narrows toward back
       ctx.fillStyle = PALETTE[i];
       ctx.fillRect(sx - Math.floor(w / 2), sy, w, STEP);
     }
@@ -1195,7 +1218,7 @@ const Art = {
     ctx.fillRect(20, -16, 4, 10);    // spoke L
     ctx.fillRect(28, -16, 4, 10);    // spoke R
     ctx.fillRect(24, -16, 4, 3);     // spoke T
-    ctx.fillRect(24, -9,  4, 3);     // spoke B
+    ctx.fillRect(24, -9, 4, 3);     // spoke B
     ctx.fillStyle = '#333';
     ctx.fillRect(24, -14, 6, 6);     // center cap
 
@@ -1210,15 +1233,15 @@ const Art = {
     ctx.fillRect(118, -16, 4, 10);
     ctx.fillRect(126, -16, 4, 10);
     ctx.fillRect(122, -16, 4, 3);
-    ctx.fillRect(122, -9,  4, 3);
+    ctx.fillRect(122, -9, 4, 3);
     ctx.fillStyle = '#333';
     ctx.fillRect(122, -14, 4, 6);
 
     // ── Undercarriage / bumpers ───────────────────────────────────────────
     ctx.fillStyle = '#222';
-    ctx.fillRect(0,   -22, 150, 4);  // sill
-    ctx.fillRect(0,   -14,  10, 14); // rear bumper
-    ctx.fillRect(140, -14,  10, 14); // front bumper
+    ctx.fillRect(0, -22, 150, 4);  // sill
+    ctx.fillRect(0, -14, 10, 14); // rear bumper
+    ctx.fillRect(140, -14, 10, 14); // front bumper
 
     // ── Box body (yellow) ────────────────────────────────────────────────
     ctx.fillStyle = YEL;
@@ -1252,13 +1275,13 @@ const Art = {
 
     // ── Body outlines ────────────────────────────────────────────────────
     ctx.fillStyle = '#111';
-    ctx.fillRect(0,  -84, 106, 2);   // body top edge
-    ctx.fillRect(0,  -84,   2, 62);  // rear edge
+    ctx.fillRect(0, -84, 106, 2);   // body top edge
+    ctx.fillRect(0, -84, 2, 62);  // rear edge
     // Panel seam lines
     ctx.fillStyle = YDK;
-    ctx.fillRect(2,  -82,   1, 58);  // rear door vertical seam
-    ctx.fillRect(2,  -50, 102,  1);  // mid-body horizontal seam
-    ctx.fillRect(58, -82,   1, 30);  // centre vertical panel seam
+    ctx.fillRect(2, -82, 1, 58);  // rear door vertical seam
+    ctx.fillRect(2, -50, 102, 1);  // mid-body horizontal seam
+    ctx.fillRect(58, -82, 1, 30);  // centre vertical panel seam
 
     // ── Thick red MDA stripe (full width) ─────────────────────────────────
     ctx.fillStyle = RED;
@@ -1267,17 +1290,17 @@ const Art = {
     // ── Star of David — red, centred on body above stripe ─────────────────
     const u = 5, scx = 52, scy = -65;
     ctx.fillStyle = RED;
-    ctx.fillRect(scx - 2,  scy - 20,  5, u);   // top spike
-    ctx.fillRect(scx - 8,  scy - 15, 18, u);
+    ctx.fillRect(scx - 2, scy - 20, 5, u);   // top spike
+    ctx.fillRect(scx - 8, scy - 15, 18, u);
     ctx.fillRect(scx - 13, scy - 10, 28, u);
-    ctx.fillRect(scx - 18, scy -  5, 11, u);   // left wing
-    ctx.fillRect(scx +  8, scy -  5, 11, u);   // right wing
-    ctx.fillRect(scx - 18, scy,      37, u);   // centre full row
-    ctx.fillRect(scx - 18, scy +  5, 11, u);
-    ctx.fillRect(scx +  8, scy +  5, 11, u);
+    ctx.fillRect(scx - 18, scy - 5, 11, u);   // left wing
+    ctx.fillRect(scx + 8, scy - 5, 11, u);   // right wing
+    ctx.fillRect(scx - 18, scy, 37, u);   // centre full row
+    ctx.fillRect(scx - 18, scy + 5, 11, u);
+    ctx.fillRect(scx + 8, scy + 5, 11, u);
     ctx.fillRect(scx - 13, scy + 10, 28, u);
-    ctx.fillRect(scx -  8, scy + 15, 18, u);
-    ctx.fillRect(scx -  2, scy + 20,  5, u);   // bottom spike
+    ctx.fillRect(scx - 8, scy + 15, 18, u);
+    ctx.fillRect(scx - 2, scy + 20, 5, u);   // bottom spike
 
     // ── Rear tail lights ─────────────────────────────────────────────────
     ctx.fillStyle = '#ff3333';
@@ -1406,9 +1429,9 @@ const Art = {
 
     // ── Posts ────────────────────────────────────────────────────────────────
     ctx.fillStyle = '#000';
-    ctx.fillRect(x - 2,            y - kH, 6, kH + 2);  // left
-    ctx.fillRect(x + doorEnd - 2,  y - kH, 6, kH + 2);  // door-wall divider
-    ctx.fillRect(x + kW - 2,       y - kH, 6, kH + 2);  // right
+    ctx.fillRect(x - 2, y - kH, 6, kH + 2);  // left
+    ctx.fillRect(x + doorEnd - 2, y - kH, 6, kH + 2);  // door-wall divider
+    ctx.fillRect(x + kW - 2, y - kH, 6, kH + 2);  // right
 
     // ── Striped awning (full width) ──────────────────────────────────────────
     const awW = kW + 12, awH = 14, awX = x - 6, awY = y - kH - 10;
@@ -1449,11 +1472,11 @@ const Art = {
     // Ventilation grilles (low on the wall — shelters need air)
     ctx.fillStyle = '#777';
     ctx.fillRect(-112, -28, 28, 10);    // left vent
-    ctx.fillRect(-72,  -28, 28, 10);    // centre vent
+    ctx.fillRect(-72, -28, 28, 10);    // centre vent
     ctx.fillStyle = '#999';
     for (let i = 0; i < 4; i++) {
       ctx.fillRect(-112 + i * 7, -28, 3, 10);   // left vent slats
-      ctx.fillRect(-72  + i * 7, -28, 3, 10);   // centre vent slats
+      ctx.fillRect(-72 + i * 7, -28, 3, 10);   // centre vent slats
     }
 
     // Civil defence orange stripe across full building (Israeli standard)
@@ -1510,7 +1533,7 @@ const Art = {
     ctx.fillStyle = '#000';
     ctx.font = 'bold 9px monospace';
     ctx.textAlign = 'center';
-    ctx.fillText('מקלט',   26, -75);
+    ctx.fillText('מקלט', 26, -75);
     ctx.fillText('ציבורי', 26, -63);
     ctx.textAlign = 'left';
 
@@ -1535,7 +1558,12 @@ class Background {
     while (x < W * 2) {
       const w = 32 + Math.floor(Math.random() * 68);
       const h = 60 + Math.floor(Math.random() * 100);
-      objs.push({ x, w, h, bType: Math.floor(Math.random() * 5) });
+      let bType = Math.floor(Math.random() * 12); // Higher number of types including landmarks
+      if (bType >= 5 && bType <= 8 && Math.random() > 0.4) {
+        // make landmarks rarer
+        bType = Math.floor(Math.random() * 5);
+      }
+      objs.push({ x, w, h, bType });
       x += w + GAP;
     }
     this.farTileW = x;
@@ -1558,8 +1586,8 @@ class Background {
   }
 
   update(dt, speed) {
-    this.farX    -= speed * 0.2 * dt;
-    this.midX    -= speed * 0.5 * dt;
+    this.farX -= speed * 0.2 * dt;
+    this.midX -= speed * 0.5 * dt;
     this.groundX -= speed * dt;
     if (this.farX < -this.farTileW) this.farX += this.farTileW;
     if (this.midX < -this.midTileW) this.midX += this.midTileW;
@@ -1569,13 +1597,38 @@ class Background {
   draw(ctx, behindFarCallback = null) {
     ctx.imageSmoothingEnabled = false;
 
-    ctx.fillStyle = '#fff';
+    // ── Night Sky Gradient ───────────────────────────────────────────────────
+    const skyGrad = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
+    skyGrad.addColorStop(0, '#081426'); // Dark space blue at the top zenith
+    skyGrad.addColorStop(1, '#1B365D'); // Deep slate blue at horizon
+    ctx.fillStyle = skyGrad;
     ctx.fillRect(0, 0, W, GROUND_Y);
-    ctx.fillStyle = '#eee';
-    ctx.fillRect(0, GROUND_Y - 8, W, 4);
+
+    // ── Procedural Stars ─────────────────────────────────────────────────────
+    ctx.fillStyle = '#2A4B75'; // Faint slate stars to keep the sky clean
+    const starOffset = Math.round(this.farX * 0.3); // Slow parallax for stars
+    for (let sx = 0; sx < W + 80; sx += 40) {
+      for (let sy = 5; sy < GROUND_Y - 40; sy += 30) {
+        // Deterministic hash based on world coordinates to ensure stable rendering
+        const worldX = sx - starOffset;
+        const hash = Math.sin(worldX * 12.9898 + sy * 78.233) * 43758.5453;
+        const fract = hash - Math.floor(hash);
+        if (fract > 0.8) {
+          ctx.globalAlpha = 0.2 + (fract % 0.8);
+          const size = fract > 0.95 ? 2 : 1;
+          ctx.fillRect(sx + (fract % 20), sy + (fract % 15), size, size);
+        }
+      }
+    }
+    ctx.globalAlpha = 1.0;
+
+    // Distant city atmospheric haze
+    ctx.fillStyle = '#12243D';
+    ctx.fillRect(0, GROUND_Y - 12, W, 12);
 
     if (behindFarCallback) behindFarCallback();
 
+    // ── Far Background (Skyline) ─────────────────────────────────────────────
     for (let copy = 0; copy < 2; copy++) {
       const cx = Math.round(this.farX) + copy * this.farTileW;
       if (cx + this.farTileW < 0 || cx > W) continue;
@@ -1587,11 +1640,16 @@ class Background {
           case 2: Art.drawBuildingBrutal(ctx, ox, GROUND_Y - o.h, o.w, o.h); break;
           case 3: Art.drawBuildingGlass(ctx, ox, GROUND_Y - o.h, o.w, o.h); break;
           case 4: Art.drawBuildingOldCity(ctx, ox, GROUND_Y - o.h, o.w, o.h); break;
+          case 5: Art.drawAzrieliCircle(ctx, ox, GROUND_Y - 160, 160); break;
+          case 6: Art.drawAzrieliTriangle(ctx, ox, GROUND_Y - 180, 180); break;
+          case 7: Art.drawAzrieliSquare(ctx, ox, GROUND_Y - 150, 150); break;
+          case 8: Art.drawReadingChimney(ctx, ox, GROUND_Y - 140, 140); break;
           default: Art.drawBuilding(ctx, ox, GROUND_Y - o.h, o.w, o.h); break;
         }
       }
     }
 
+    // ── Mid Background (Trees, Bus Stops, Kiosks) ────────────────────────────
     for (let copy = 0; copy < 2; copy++) {
       const cx = Math.round(this.midX) + copy * this.midTileW;
       if (cx + this.midTileW < 0 || cx > W) continue;
@@ -1616,21 +1674,24 @@ class Background {
       }
     }
 
-    ctx.fillStyle = '#333';
+    // ── Ground/Asphalt (Darker for night time) ───────────────────────────────
+    ctx.fillStyle = '#0A111C';
     ctx.fillRect(0, GROUND_Y, W, H - GROUND_Y);
-    ctx.fillStyle = '#000';
+    ctx.fillStyle = '#05080E';
     ctx.fillRect(0, GROUND_Y, W, 2);
 
-    ctx.fillStyle = '#555';
+    // Glowing road dashed lines (illuminated by headlights/streetlights)
+    ctx.fillStyle = '#FF8C00';
     const dashY = GROUND_Y + 12;
     const dashOff = ((Math.round(this.groundX) % 40) + 40) % 40;
     for (let dx = -40 + dashOff; dx < W + 40; dx += 40) {
       ctx.fillRect(dx, dashY, 20, 3);
     }
 
-    ctx.fillStyle = '#444';
+    // Cracks/texture on the road
+    ctx.fillStyle = '#080C14';
     for (let gx = 0; gx < W; gx += 8) {
-      if ((gx / 8) % 3 === 0) ctx.fillRect(gx, GROUND_Y + 24, 4, 2);
+      if ((gx / 8) % 3 === 0) ctx.fillRect(gx, GROUND_Y + 24, 4, 3);
     }
   }
 }
@@ -1686,12 +1747,12 @@ class Player {
 
 // ─── Obstacle ────────────────────────────────────────────────────────────────
 const OBSTACLE_TYPES = [
-  { type: 'trashcan',   w: 28, h: 44, minLevel: 1, aerial: false },
-  { type: 'scooter',    w: 56, h: 40, minLevel: 1, aerial: false },
+  { type: 'trashcan', w: 28, h: 44, minLevel: 1, aerial: false },
+  { type: 'scooter', w: 56, h: 40, minLevel: 1, aerial: false },
   { type: 'pedestrian', w: 22, h: 66, minLevel: 1, aerial: false },
-  { type: 'cat',        w: 36, h: 20, minLevel: 1, aerial: false },
-  { type: 'bird',       w: 44, h: 18, minLevel: 2, aerial: true, airY: GROUND_Y - 50 },
-  { type: 'drone',      w: 58, h: 22, minLevel: 2, aerial: true, airY: GROUND_Y - 55 },
+  { type: 'cat', w: 36, h: 20, minLevel: 1, aerial: false },
+  { type: 'bird', w: 44, h: 18, minLevel: 2, aerial: true, airY: GROUND_Y - 50 },
+  { type: 'drone', w: 58, h: 22, minLevel: 2, aerial: true, airY: GROUND_Y - 55 },
 ];
 
 class Obstacle {
@@ -1732,12 +1793,12 @@ class Obstacle {
 
   draw(ctx) {
     switch (this.type) {
-      case 'trashcan':   Art.drawTrashCan(ctx, this.x, this.y); break;
-      case 'scooter':    Art.drawScooter(ctx, this.x, this.y); break;
+      case 'trashcan': Art.drawTrashCan(ctx, this.x, this.y); break;
+      case 'scooter': Art.drawScooter(ctx, this.x, this.y); break;
       case 'pedestrian': Art.drawPedestrian(ctx, this.x, this.y, this.animFrame, this.pedGender, this.pedScheme); break;
-      case 'cat':        Art.drawCat(ctx, this.x, this.y, this.animFrame, this.catScheme); break;
-      case 'bird':       Art.drawBird(ctx, this.x, this.y, this.animFrame); break;
-      case 'drone':      Art.drawDrone(ctx, this.x, this.y, this.animFrame); break;
+      case 'cat': Art.drawCat(ctx, this.x, this.y, this.animFrame, this.catScheme); break;
+      case 'bird': Art.drawBird(ctx, this.x, this.y, this.animFrame); break;
+      case 'drone': Art.drawDrone(ctx, this.x, this.y, this.animFrame); break;
     }
   }
 }
@@ -1811,7 +1872,7 @@ class ParticleSystem {
 const HUD = {
   draw(ctx, level, timeLeft, distToShelter, shelterActive) {
     ctx.imageSmoothingEnabled = false;
-    ctx.fillStyle = '#000';
+    ctx.fillStyle = '#fff';
     ctx.font = 'bold 14px monospace';
     ctx.textAlign = 'left';
     ctx.fillText(`LVL ${level}`, 14, 24);
@@ -1825,9 +1886,9 @@ const HUD = {
     if (ss <= 10 && Math.floor(Date.now() / 250) % 2 === 0) {
       ctx.fillStyle = '#fff';
       ctx.fillText(timeStr, W / 2 + 1, 28);
-      ctx.fillStyle = '#000';
+      ctx.fillStyle = '#fff';
     }
-    ctx.fillStyle = '#000';
+    ctx.fillStyle = '#fff';
     ctx.fillText(timeStr, W / 2, 28);
 
     // Right: distance to shelter counting down, then "RUN!" when shelter visible
@@ -1885,7 +1946,7 @@ class Game {
 
     // Try to lock to landscape via Screen Orientation API (Android Chrome, etc.)
     if (screen.orientation && screen.orientation.lock) {
-      screen.orientation.lock('landscape').catch(() => {});
+      screen.orientation.lock('landscape').catch(() => { });
     }
 
     requestAnimationFrame(t => this._loop(t));
@@ -1905,7 +1966,7 @@ class Game {
     window.addEventListener('keydown', e => {
       const k = e.code;
       if (!this._keys[k]) { this._keys[k] = true; this._onKeyDown(k); }
-      if (['Space','ArrowUp','ArrowDown'].includes(k)) e.preventDefault();
+      if (['Space', 'ArrowUp', 'ArrowDown'].includes(k)) e.preventDefault();
     });
     window.addEventListener('keyup', e => {
       this._keys[e.code] = false;
@@ -2003,7 +2064,7 @@ class Game {
 
   _completeLevel() {
     this.shelterEntering = false;
-    this.particles.burst(W / 2, H / 2, 40, ['#fff','#aaa','#555','#000']);
+    this.particles.burst(W / 2, H / 2, 40, ['#fff', '#aaa', '#555', '#000']);
     this.currentLevel++;
     if (this.currentLevel >= LEVELS.length) {
       this.state = STATE.VICTORY;
@@ -2024,9 +2085,9 @@ class Game {
 
   _update(dt) {
     switch (this.state) {
-      case STATE.ALERT:      this._updateAlert(dt);      break;
-      case STATE.PLAYING:    this._updatePlaying(dt);    break;
-      case STATE.CRASH_ANIM: this._updateCrashAnim(dt);  break;
+      case STATE.ALERT: this._updateAlert(dt); break;
+      case STATE.PLAYING: this._updatePlaying(dt); break;
+      case STATE.CRASH_ANIM: this._updateCrashAnim(dt); break;
     }
     this.particles.update(dt);
   }
@@ -2168,8 +2229,8 @@ class Game {
       }
     }
     for (const ex of this.ambientExplosions) ex.t += dt;
-    this.ambientTrails      = this.ambientTrails.filter(tr => tr.t < tr.duration + 0.1);
-    this.ambientExplosions  = this.ambientExplosions.filter(ex => ex.t < ex.duration);
+    this.ambientTrails = this.ambientTrails.filter(tr => tr.t < tr.duration + 0.1);
+    this.ambientExplosions = this.ambientExplosions.filter(ex => ex.t < ex.duration);
   }
 
   _draw() {
@@ -2177,13 +2238,13 @@ class Game {
     ctx.imageSmoothingEnabled = false;
     ctx.clearRect(0, 0, W, H);
     switch (this.state) {
-      case STATE.MENU:           this._drawMenu(); break;
-      case STATE.ALERT:          this._drawAlert(); break;
-      case STATE.PLAYING:        this._drawPlaying(); break;
+      case STATE.MENU: this._drawMenu(); break;
+      case STATE.ALERT: this._drawAlert(); break;
+      case STATE.PLAYING: this._drawPlaying(); break;
       case STATE.LEVEL_COMPLETE: this._drawLevelComplete(); break;
-      case STATE.GAME_OVER:      this._drawGameOver(); break;
-      case STATE.VICTORY:        this._drawVictory(); break;
-      case STATE.CRASH_ANIM:     this._drawCrashAnim(); break;
+      case STATE.GAME_OVER: this._drawGameOver(); break;
+      case STATE.VICTORY: this._drawVictory(); break;
+      case STATE.CRASH_ANIM: this._drawCrashAnim(); break;
     }
   }
 
@@ -2339,7 +2400,7 @@ class Game {
     const TRAIL_DUR = 0.57; // seconds for rocket to rise before exploding
     // Each entry: trail launches TRAIL_DUR seconds before the explosion
     const raw = [
-      { spawnT: 0.45, x: 80  + Math.floor(Math.random() * 160), y: 18 + Math.floor(Math.random() * 46), dur: 0.60 },
+      { spawnT: 0.45, x: 80 + Math.floor(Math.random() * 160), y: 18 + Math.floor(Math.random() * 46), dur: 0.60 },
       { spawnT: 0.85, x: 300 + Math.floor(Math.random() * 160), y: 14 + Math.floor(Math.random() * 50), dur: 0.55 },
       { spawnT: 1.25, x: 140 + Math.floor(Math.random() * 260), y: 20 + Math.floor(Math.random() * 44), dur: 0.60 },
       { spawnT: 1.65, x: 430 + Math.floor(Math.random() * 160), y: 12 + Math.floor(Math.random() * 54), dur: 0.55 },
@@ -2351,7 +2412,7 @@ class Game {
     }));
     this.crashAmbulanceX = -160;       // 150px wide — starts fully off-screen
     this.crashAmbulanceTarget = W / 2 - 75; // stops centered on screen
-    this.particles.burst(this.player.x, this.player.y - 30, 20, ['#f00','#f60','#fa0','#ff0','#fff']);
+    this.particles.burst(this.player.x, this.player.y - 30, 20, ['#f00', '#f60', '#fa0', '#ff0', '#fff']);
     this.state = STATE.CRASH_ANIM;
   }
 
@@ -2407,7 +2468,7 @@ class Game {
       }
     }
 
-    for (const tr of this.crashTrails)    tr.t += dt;
+    for (const tr of this.crashTrails) tr.t += dt;
     for (const ex of this.crashExplosions) ex.t += dt;
 
     // Ambulance drives in from left starting at t=0.3
@@ -2533,7 +2594,7 @@ class Game {
     this.particles.draw(ctx);
     if (Math.floor(Date.now() / 800) % 2 === 0 && this.particles.particles.length < 80) {
       this.particles.burst(100 + Math.random() * 600, 50 + Math.random() * 150, 30,
-        ['#fff','#aaa','#888','#555','#ccc']);
+        ['#fff', '#aaa', '#888', '#555', '#ccc']);
     }
     ctx.textAlign = 'center';
     ctx.font = 'bold 38px monospace';
