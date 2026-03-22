@@ -30,13 +30,13 @@ const Art = {
 
     // Pixel-art color palette matching warm concept art guidelines
     const C = {
-      out: '#331100',
-      cap: '#FF6A00',
+      out: '#081426',
+      cap: '#111111',
       hair: '#803300',
       skin: '#FFB86C',
-      shirt: '#FFE3AF',
+      shirt: '#FFFFFF',
       pants: '#B34700',
-      shoe: '#4A1D00', sole: '#FFCA80',
+      shoe: '#111111', sole: '#FFFFFF',
     };
 
     // Helper to draw blocky pixel shapes with thick borders
@@ -58,14 +58,46 @@ const Art = {
       b(hx + 10, hy - 8, 4, 4, C.hair, false); // Mustache/Cheek
       b(hx + 6, hy - 12, 4, 4, '#fff', false); // Eye sclera
       ctx.fillStyle = C.out; ctx.fillRect(hx + 8, hy - 12, 2, 4); // Pupil (black)
-      // Cap
-      b(hx - 2, hy - 24, 16, 10, C.cap); // Dome
-      b(hx + 14, hy - 18, 12, 4, C.cap); // Brim
+      // ── Baseball Cap ─────────────────────────────────────────────
+      // Outer dark outline of dome (drawn slightly larger)
+      ctx.fillStyle = C.out;
+      ctx.fillRect(hx + 2, hy - 24, 9,  2);  // top outline
+      ctx.fillRect(hx - 1, hy - 22, 15, 2);  // upper outline
+      ctx.fillRect(hx - 3, hy - 20, 19, 12); // body outline
+      // Dome body — staircase for roundness
+      ctx.fillStyle = C.cap;
+      ctx.fillRect(hx + 3, hy - 23, 7,  2);  // button top (narrow)
+      ctx.fillRect(hx,     hy - 21, 13, 3);  // narrow upper dome
+      ctx.fillRect(hx - 1, hy - 18, 15, 9);  // main dome body
+      // Center crown seam
+      ctx.fillStyle = '#333333';
+      ctx.fillRect(hx + 6, hy - 23, 1, 11);  // seam line
+      // Sweatband
+      ctx.fillStyle = '#222222';
+      ctx.fillRect(hx - 1, hy - 10, 15, 3);
+      // ── Logo: white pixel-art semicircle on the front panel ──
+      // Arch rows (wider at bottom, narrower at top = upward arch)
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(hx + 9, hy - 17, 4, 1); // top arch (2px wide)
+      ctx.fillRect(hx + 8, hy - 16, 6, 1); // mid-upper  
+      ctx.fillRect(hx + 7, hy - 15, 1, 1); ctx.fillRect(hx + 13, hy - 15, 1, 1); // sides
+      ctx.fillRect(hx + 7, hy - 14, 1, 1); ctx.fillRect(hx + 13, hy - 14, 1, 1); // sides lower
+      // Brim — main body
+      ctx.fillStyle = C.out;
+      ctx.fillRect(hx + 13, hy - 12, 16, 5); // brim outline
+      ctx.fillStyle = C.cap;
+      ctx.fillRect(hx + 13, hy - 11, 14, 3); // brim top surface
+      // Brim tip slopes down
+      ctx.fillStyle = C.cap;
+      ctx.fillRect(hx + 24, hy - 10, 3, 2);
+      // Brim underside shadow
+      ctx.fillStyle = '#333333';
+      ctx.fillRect(hx + 13, hy - 8, 14, 2);
     };
 
     if (state === 'duck') {
-      b(-14, -8, 12, 6, C.shoe); b(-14, -2, 12, 2, C.sole, false);
-      b(2, -8, 12, 6, C.shoe); b(2, -2, 12, 2, C.sole, false);
+      b(-8, -8, 12, 6, C.shoe); b(-8, -2, 12, 2, C.sole, false);
+      b(8, -8, 12, 6, C.shoe); b(8, -2, 12, 2, C.sole, false);
       b(-10, -20, 26, 12, C.pants); // crouched pants
       b(-6, -32, 20, 14, C.shirt); // crouched torso
       drawHead(4, -28); // Head shifted right and down
@@ -81,12 +113,12 @@ const Art = {
       // Back Leg
       b(-12, -28, 10, 12, C.pants);
       b(-20, -20, 10, 12, C.pants);
-      b(-28, -10, 12, 6, C.shoe); b(-28, -4, 12, 2, C.sole, false);
+      b(-22, -10, 12, 6, C.shoe); b(-22, -4, 12, 2, C.sole, false);
 
       // Front Leg
       b(0, -32, 18, 10, C.pants);
       b(12, -26, 8, 16, C.pants);
-      b(10, -10, 12, 6, C.shoe); b(10, -4, 12, 2, C.sole, false);
+      b(16, -10, 12, 6, C.shoe); b(16, -4, 12, 2, C.sole, false);
 
       // Torso
       b(-6, -52, 16, 26, C.shirt);
@@ -136,8 +168,8 @@ const Art = {
       const drawLeg = (thX, shX, ftX, ftYoff) => {
         b(thX, -28, 10, 14, C.pants);
         b(shX, -16, 8, 12, C.pants);
-        b(ftX - 2, -6 + ftYoff, 12, 6, C.shoe);
-        b(ftX - 2, 0 + ftYoff, 12, 2, C.sole, false);
+        b(ftX + 4, -6 + ftYoff, 12, 6, C.shoe);
+        b(ftX + 4, 0 + ftYoff, 12, 2, C.sole, false);
       };
       if (f < 2) { drawLeg(lTh, lSh, lFt, lFY); drawLeg(rTh, rSh, rFt, rFY); }
       else { drawLeg(rTh, rSh, rFt, rFY); drawLeg(lTh, lSh, lFt, lFY); }
@@ -174,7 +206,7 @@ const Art = {
     ctx.translate(x, y);
     ctx.imageSmoothingEnabled = false;
     // Dark stroke outline (drawn first, 1px larger on each side)
-    ctx.fillStyle = '#222';
+    ctx.fillStyle = '#081426';
     ctx.fillRect(-15, -45, 30, 10);  // lid outline
     ctx.fillRect(-13, -39, 26, 40);  // body outline
     // Lid
@@ -200,7 +232,7 @@ const Art = {
     ctx.translate(x, y);
     ctx.imageSmoothingEnabled = false;
 
-    const OUT = '#333';    // dark gray outline
+    const OUT = '#081426'; // dark blue outline
     const GRN = '#1e7a30'; // deep green body
     const LGRN = '#34b84e'; // lighter green highlight
     const TIRE = '#222';
@@ -278,7 +310,7 @@ const Art = {
 
   drawPedestrian(ctx, x, y, frame, gender = 0, scheme = 0) {
     const P = {
-      out: '#331100',
+      out: '#081426',
       skin: '#FFB86C',
       sole: '#E8E8E4' // basic white/grey sole
     };
@@ -421,9 +453,9 @@ const Art = {
   },
 
   drawCat(ctx, x, y, frame, catScheme = 0) {
-    const P = { out: '#331100' };
+    const P = { out: '#081426' };
     const schemes = [
-      { body: '#222222', accent: '#555555', eye: '#FFDD00' }, // Black
+      { body: '#444444', accent: '#777777', eye: '#FFDD00' }, // Dark gray
       { body: '#EEEEEE', accent: '#AAAAAA', eye: '#00AAFF' }, // White
       { body: '#FF8800', accent: '#FFCC00', eye: '#00FF00' }, // Ginger
     ];
@@ -431,6 +463,8 @@ const Art = {
 
     ctx.save();
     ctx.translate(x, y);
+    // Mirror so cat faces right (same direction as the player)
+    ctx.scale(-1, 1);
     ctx.imageSmoothingEnabled = false;
 
     const b = (bx, by, bw, bh, color, out = true) => {
@@ -442,53 +476,97 @@ const Art = {
       ctx.fillRect(bx, by, bw, bh);
     };
 
-    const isStretched = (Math.floor(frame) % 2) === 0;
+    const isFlying = frame >= 4; // flying/jump pose when player jumps over cat
 
-    // Far legs (darker)
-    if (isStretched) {
-      b(-12, -10, 4, 10, c.accent); // far front
-      b(6, -10, 4, 10, c.accent);   // far back
+    if (isFlying) {
+      // ── FLYING POSE — paws angled forward/backward, 45° tail ──
+
+      // Far front paw — angled forward-up (staircase diagonals going right)
+      b(4, -30, 4, 4, c.accent);
+      b(8, -26, 4, 4, c.accent);
+      b(12, -22, 4, 4, c.accent);
+
+      // Far back paw — angled backward-up (staircase going left)
+      b(-14, -30, 4, 4, c.accent);
+      b(-18, -26, 4, 4, c.accent);
+      b(-22, -22, 4, 4, c.accent);
+
+      // Body
+      b(-10, -24, 22, 14, c.body);
+
+      // Near front paw — angled forward-down (staircase going right)
+      b(4, -14, 4, 4, c.body);
+      b(8, -10, 4, 4, c.body);
+      b(12, -6, 4, 4, c.body);
+
+      // Near back paw — angled backward-down (staircase going left)
+      b(-14, -14, 4, 4, c.body);
+      b(-18, -10, 4, 4, c.body);
+      b(-22, -6, 4, 4, c.body);
+
+      // Tail — 45° diagonal going up-right from body
+      b(12, -22, 4, 4, c.body);
+      b(16, -26, 4, 4, c.body);
+      b(20, -30, 4, 4, c.body);
+      b(24, -34, 4, 4, c.body);
+
+      // Head (leaning back)
+      b(-20, -30, 14, 12, c.body);
+      b(-18, -36, 4, 6, c.accent); // ear left
+      b(-10, -36, 4, 6, c.accent); // ear right
+      ctx.fillStyle = P.out; ctx.fillRect(-18, -28, 4, 4);
+      b(-16, -26, 2, 2, c.eye, false);
+      b(-22, -22, 2, 2, '#FFAAAA', false); // nose
     } else {
-      b(-8, -10, 4, 10, c.accent);  // far front
-      b(2, -10, 4, 10, c.accent);   // far back
+      // ── NORMAL RUN POSE ──
+      const isStretched = (Math.floor(frame) % 2) === 0;
+
+      // Far legs (darker)
+      if (isStretched) {
+        b(-12, -10, 4, 10, c.accent); // far front
+        b(6, -10, 4, 10, c.accent);   // far back
+      } else {
+        b(-8, -10, 4, 10, c.accent);  // far front
+        b(2, -10, 4, 10, c.accent);   // far back
+      }
+
+      const bob = isStretched ? 0 : -2;
+      ctx.translate(0, bob);
+
+      // Tail
+      if (isStretched) {
+        b(12, -18, 12, 4, c.body); // straight
+      } else {
+        b(12, -20, 6, 4, c.body); // curving up
+        b(16, -26, 4, 8, c.body);
+      }
+
+      // Body
+      b(-10, -20, 22, 12, c.body);
+
+      // Near legs
+      if (isStretched) {
+        b(-16, -10 - bob, 4, 10, c.body); // near front
+        b(10, -10 - bob, 4, 10, c.body);  // near back
+      } else {
+        b(-12, -8 - bob, 4, 8, c.body);   // near front
+        b(4, -8 - bob, 4, 8, c.body);     // near back
+      }
+
+      // Head
+      b(-18, -26, 14, 12, c.body);
+
+      // Ears
+      b(-16, -32, 4, 6, c.accent);
+      b(-8, -32, 4, 6, c.accent);
+
+      // Eye
+      ctx.fillStyle = P.out; ctx.fillRect(-16, -24, 4, 4); // Eye outline
+      b(-14, -22, 2, 2, c.eye, false); // Pupil/iris
+
+      // Nose
+      b(-20, -18, 2, 2, '#FFAAAA', false);
     }
-
-    const bob = isStretched ? 0 : -2;
-    ctx.translate(0, bob);
-
-    // Tail
-    if (isStretched) {
-      b(12, -18, 12, 4, c.body); // straight
-    } else {
-      b(12, -20, 6, 4, c.body); // curving up
-      b(16, -26, 4, 8, c.body);
-    }
-
-    // Body
-    b(-10, -20, 22, 12, c.body);
-
-    // Near legs
-    if (isStretched) {
-      b(-16, -10 - bob, 4, 10, c.body); // near front
-      b(10, -10 - bob, 4, 10, c.body);  // near back
-    } else {
-      b(-12, -8 - bob, 4, 8, c.body);   // near front
-      b(4, -8 - bob, 4, 8, c.body);     // near back
-    }
-
-    // Head
-    b(-18, -26, 14, 12, c.body);
-
-    // Ears
-    b(-16, -32, 4, 6, c.accent);
-    b(-8, -32, 4, 6, c.accent);
-
-    // Eye
-    ctx.fillStyle = P.out; ctx.fillRect(-16, -24, 4, 4); // Eye outline
-    b(-14, -22, 2, 2, c.eye, false); // Pupil/iris
-
-    // Nose
-    b(-20, -18, 2, 2, '#FFAAAA', false);
 
     ctx.restore();
   },
@@ -497,15 +575,15 @@ const Art = {
     ctx.save();
     ctx.translate(x, y);
     ctx.imageSmoothingEnabled = false;
-    ctx.fillStyle = '#000';
+    ctx.fillStyle = '#081426';
     ctx.fillRect(-14, -8, 28, 14);
     ctx.fillStyle = '#aaa';
     ctx.fillRect(-12, -6, 24, 10);
-    ctx.fillStyle = '#000';
+    ctx.fillStyle = '#081426';
     ctx.fillRect(10, -12, 12, 10);
     ctx.fillStyle = '#aaa';
     ctx.fillRect(12, -10, 8, 6);
-    ctx.fillStyle = '#000';
+    ctx.fillStyle = '#081426';
     ctx.fillRect(17, -9, 2, 2);
     ctx.fillRect(20, -8, 6, 4);
     const wingY = frame === 0 ? -12 : 4;
@@ -629,53 +707,120 @@ const Art = {
     ctx.restore();
   },
 
-  drawPalmTree(ctx, x, y, h) {
+  drawTreeOak(ctx, x, y) {
+    // Wide round canopy with forked trunk (pixel art oak)
     ctx.save();
     ctx.imageSmoothingEnabled = false;
-    ctx.fillStyle = '#0D1A2B'; // night silhouette
-    for (let i = 0; i < h; i += 4) {
-      const off = Math.round(Math.sin(i * 0.06) * 2);
-      ctx.fillRect(x + off, y - i - 4, 4, 4);
-    }
-    const tx = x + Math.round(Math.sin(h * 0.06) * 2), ty = y - h;
-    const fronds = [[-24, -10], [-14, -18], [0, -20], [14, -18], [24, -8], [16, 2], [-12, 2]];
-    ctx.fillStyle = '#060C14'; // very dark fronds
-    fronds.forEach(([dx, dy]) => {
-      const steps = Math.max(Math.abs(dx), Math.abs(dy)) / 4;
-      for (let s = 0; s <= steps; s++) {
-        const t = s / steps;
-        const px = Math.round(tx + dx * t);
-        const py = Math.round(ty + dy * t - Math.sin(t * Math.PI) * 6);
-        ctx.fillRect(px, py, 4, 3);
-      }
-    });
+
+    const SHADOW = '#061810';
+    const DARK   = '#0C2E1C';
+    const MID    = '#163D28';
+    const HI     = '#1E5234';
+    const GLOW   = '#266642';
+    const TRUNK_D = '#1A0A04';
+    const TRUNK_M = '#2E120A';
+
+    // Trunk (extended to meet canopy base at y-58)
+    ctx.fillStyle = TRUNK_D;
+    ctx.fillRect(x - 6, y - 58, 12, 58);
+    ctx.fillStyle = TRUNK_M;
+    ctx.fillRect(x - 4, y - 56, 9, 56);
+    ctx.fillStyle = TRUNK_D;
+    ctx.fillRect(x - 4, y - 56, 3, 56); // shadow strip
+
+    // Fork branches (reach up to y-58 to close gap with canopy)
+    ctx.fillStyle = TRUNK_D;
+    ctx.fillRect(x - 14, y - 58, 12, 18);
+    ctx.fillRect(x + 4,  y - 58, 12, 18);
+    ctx.fillStyle = TRUNK_M;
+    ctx.fillRect(x - 12, y - 56, 10, 16);
+    ctx.fillRect(x + 5,  y - 56, 10, 16);
+
+    // Tier 1 — base (widest)
+    ctx.fillStyle = SHADOW;
+    ctx.fillRect(x - 38, y - 78, 76, 20);
+    ctx.fillStyle = DARK;
+    ctx.fillRect(x - 36, y - 76, 72, 16);
+    ctx.fillStyle = MID;
+    ctx.fillRect(x - 34, y - 74, 68, 12);
+    // side bumps
+    ctx.fillStyle = DARK;
+    ctx.fillRect(x - 46, y - 74, 10, 12);
+    ctx.fillRect(x + 36, y - 74, 10, 12);
+    ctx.fillStyle = MID;
+    ctx.fillRect(x - 44, y - 72, 8,  8);
+    ctx.fillRect(x + 38, y - 72, 8,  8);
+
+    // Tier 2
+    ctx.fillStyle = SHADOW;
+    ctx.fillRect(x - 30, y - 94, 60, 18);
+    ctx.fillStyle = DARK;
+    ctx.fillRect(x - 28, y - 92, 56, 14);
+    ctx.fillStyle = MID;
+    ctx.fillRect(x - 26, y - 90, 52, 10);
+
+    // Tier 3
+    ctx.fillStyle = SHADOW;
+    ctx.fillRect(x - 20, y - 108, 40, 16);
+    ctx.fillStyle = DARK;
+    ctx.fillRect(x - 18, y - 106, 36, 12);
+    ctx.fillStyle = MID;
+    ctx.fillRect(x - 16, y - 104, 32, 8);
+
+    // Tier 4
+    ctx.fillStyle = SHADOW;
+    ctx.fillRect(x - 12, y - 120, 24, 14);
+    ctx.fillStyle = DARK;
+    ctx.fillRect(x - 10, y - 118, 20, 10);
+    ctx.fillStyle = MID;
+    ctx.fillRect(x - 8,  y - 116, 16, 6);
+
+    // Peak
+    ctx.fillStyle = SHADOW;
+    ctx.fillRect(x - 6, y - 130, 12, 12);
+    ctx.fillStyle = MID;
+    ctx.fillRect(x - 4, y - 128, 8,  8);
+    ctx.fillStyle = HI;
+    ctx.fillRect(x - 2, y - 126, 4,  6);
+
+    // Highlight patches — upper-right clusters
+    ctx.fillStyle = HI;
+    ctx.fillRect(x + 6,  y - 118, 10, 8);
+    ctx.fillRect(x + 12, y - 104, 10, 6);
+    ctx.fillRect(x + 16, y - 90,  10, 6);
+    ctx.fillRect(x + 14, y - 76,  10, 6);
+    ctx.fillStyle = GLOW;
+    ctx.fillRect(x + 8,  y - 116, 6,  4);
+    ctx.fillRect(x + 14, y - 102, 6,  4);
+
     ctx.restore();
   },
 
   drawMakolet(ctx, x, y) {
     ctx.save();
     ctx.imageSmoothingEnabled = false;
-    ctx.fillStyle = '#08101A'; // dark alley wall
+    ctx.fillStyle = '#261406'; // dark amber wall outline
     ctx.fillRect(x, y - 60, 80, 60);
-    ctx.fillStyle = '#0E1B2E'; // front wall - painted white in day, now grey in dark
+    ctx.fillStyle = '#3C2410'; // warm orange-yellow front wall
     ctx.fillRect(x + 2, y - 58, 76, 56);
     // Roof outline
-    ctx.fillStyle = '#0B1524';
+    ctx.fillStyle = '#3A1E08';
     ctx.fillRect(x - 6, y - 70, 92, 14);
-    // Dark awning
-    ctx.fillStyle = '#060B14';
+    // Awning base
+    ctx.fillStyle = '#160A02';
     ctx.fillRect(x - 4, y - 68, 88, 12);
-    ctx.fillStyle = '#1A2A44';
+    // Awning stripes — warm orange alternating
+    ctx.fillStyle = '#B85A00';
     for (let i = 0; i < 8; i++) {
       if (i % 2 === 0) ctx.fillRect(x - 4 + i * 11, y - 68, 11, 12);
     }
     // Main bright shop window (glowing)
-    ctx.fillStyle = '#FFB84D'; // bright warm interior light
+    ctx.fillStyle = '#FFB000'; // amber interior light — matches building windows
     ctx.fillRect(x + 28, y - 36, 24, 36);
-    ctx.fillStyle = '#FF8800';
+    ctx.fillStyle = '#CC7A00';
     ctx.fillRect(x + 30, y - 34, 20, 32);
     // Items inside window (silhouettes)
-    ctx.fillStyle = '#2E1200';
+    ctx.fillStyle = '#081426';
     ctx.fillRect(x + 32, y - 10, 16, 10);
     ctx.fillRect(x + 36, y - 20, 8, 10);
     ctx.fillRect(x + 46, y - 18, 4, 4);
@@ -684,13 +829,14 @@ const Art = {
     ctx.fillRect(x + 6, y - 56, 22, 12);
     ctx.fillStyle = '#FFAA00';
     ctx.fillRect(x + 7, y - 55, 20, 10);
-    ctx.fillStyle = '#662200';
+    ctx.fillStyle = '#261406';
     ctx.font = 'bold 7px monospace';
     ctx.fillText('MKLT', x + 44, y - 44);
 
-    // secondary dark window
+    // secondary window
+    ctx.fillStyle = '#2A1206';
     ctx.fillRect(x + 50, y - 56, 22, 14);
-    ctx.fillStyle = '#09101C';
+    ctx.fillStyle = '#160A02';
     ctx.fillRect(x + 52, y - 54, 18, 10);
     ctx.restore();
   },
@@ -959,36 +1105,156 @@ const Art = {
     ctx.restore();
   },
 
-  drawFicusTree(ctx, x, y) {
+  drawTreePine(ctx, x, y) {
+    // Layered conifer / pine tree
     ctx.save();
     ctx.imageSmoothingEnabled = false;
-    // Thick short trunk (dark silhouette)
-    ctx.fillStyle = '#0b0e0c';
-    ctx.fillRect(x - 7, y - 28, 14, 28);
-    ctx.fillStyle = '#080a08';
-    ctx.fillRect(x - 5, y - 26, 10, 24);
-    // Root spread
-    ctx.fillStyle = '#0b0e0c';
-    ctx.fillRect(x - 13, y - 8, 8, 8);
-    ctx.fillRect(x + 5, y - 8, 8, 8);
-    // Canopy — wide and bushy
-    ctx.fillStyle = '#0a0d0a';
-    ctx.fillRect(x - 34, y - 54, 68, 30);
-    ctx.fillStyle = '#111511';
-    ctx.fillRect(x - 32, y - 52, 64, 26);
-    ctx.fillStyle = '#0a0d0a';
-    ctx.fillRect(x - 24, y - 76, 48, 26);
-    ctx.fillStyle = '#111511';
-    ctx.fillRect(x - 22, y - 74, 44, 22);
-    ctx.fillStyle = '#0a0d0a';
-    ctx.fillRect(x - 14, y - 92, 28, 20);
-    ctx.fillStyle = '#111511';
-    ctx.fillRect(x - 12, y - 90, 24, 16);
-    // Leaf texture hints
-    ctx.fillStyle = '#080a08';
-    ctx.fillRect(x - 28, y - 56, 10, 6);
-    ctx.fillRect(x + 18, y - 52, 10, 6);
-    ctx.fillRect(x - 8, y - 78, 10, 6);
+
+    const SHADOW  = '#061810';
+    const DARK    = '#0C2E1C';
+    const MID     = '#163D28';
+    const HI      = '#1E5234';
+    const GLOW    = '#266642';
+    const TRUNK_D = '#1A0A04';
+    const TRUNK_M = '#2E120A';
+
+    // Trunk (short, visible below bottom layer)
+    ctx.fillStyle = TRUNK_D;
+    ctx.fillRect(x - 4, y - 22, 8, 22);
+    ctx.fillStyle = TRUNK_M;
+    ctx.fillRect(x - 3, y - 20, 6, 20);
+    ctx.fillStyle = TRUNK_D;
+    ctx.fillRect(x - 3, y - 20, 2, 20); // shadow strip
+
+    // Layer 1 — bottom (widest, drooping skirt)
+    ctx.fillStyle = SHADOW;
+    ctx.fillRect(x - 28, y - 22, 56, 10); // drooping skirt base
+    ctx.fillStyle = DARK;
+    ctx.fillRect(x - 26, y - 30, 52, 16);
+    ctx.fillStyle = MID;
+    ctx.fillRect(x - 24, y - 28, 48, 12);
+    ctx.fillStyle = HI;
+    ctx.fillRect(x - 18, y - 28, 12, 6);
+    ctx.fillRect(x + 6,  y - 28, 10, 4);
+
+    // Layer 2
+    ctx.fillStyle = SHADOW;
+    ctx.fillRect(x - 22, y - 44, 44, 14);
+    ctx.fillStyle = DARK;
+    ctx.fillRect(x - 20, y - 52, 40, 16);
+    ctx.fillStyle = MID;
+    ctx.fillRect(x - 18, y - 50, 36, 12);
+    ctx.fillStyle = HI;
+    ctx.fillRect(x - 12, y - 50, 10, 6);
+    ctx.fillRect(x + 4,  y - 50, 8,  4);
+
+    // Layer 3
+    ctx.fillStyle = SHADOW;
+    ctx.fillRect(x - 16, y - 64, 32, 12);
+    ctx.fillStyle = DARK;
+    ctx.fillRect(x - 14, y - 72, 28, 14);
+    ctx.fillStyle = MID;
+    ctx.fillRect(x - 12, y - 70, 24, 10);
+    ctx.fillStyle = HI;
+    ctx.fillRect(x - 6,  y - 70, 8,  5);
+
+    // Layer 4
+    ctx.fillStyle = SHADOW;
+    ctx.fillRect(x - 10, y - 82, 20, 10);
+    ctx.fillStyle = DARK;
+    ctx.fillRect(x - 8,  y - 90, 16, 12);
+    ctx.fillStyle = MID;
+    ctx.fillRect(x - 6,  y - 88, 12, 8);
+    ctx.fillStyle = HI;
+    ctx.fillRect(x - 2,  y - 88, 6,  4);
+
+    // Top spike
+    ctx.fillStyle = DARK;
+    ctx.fillRect(x - 4, y - 104, 8, 16);
+    ctx.fillStyle = MID;
+    ctx.fillRect(x - 2, y - 102, 4, 12);
+    ctx.fillStyle = HI;
+    ctx.fillRect(x - 2, y - 104, 4,  4);
+    ctx.fillStyle = GLOW;
+    ctx.fillRect(x - 1, y - 104, 2,  2);
+
+    ctx.restore();
+  },
+
+  drawTreeCypress(ctx, x, y) {
+    // Tall narrow cypress / column tree
+    ctx.save();
+    ctx.imageSmoothingEnabled = false;
+
+    const SHADOW  = '#061810';
+    const DARK    = '#0C2E1C';
+    const MID     = '#163D28';
+    const HI      = '#1E5234';
+    const TRUNK_D = '#1A0A04';
+    const TRUNK_M = '#2E120A';
+
+    // Short trunk
+    ctx.fillStyle = TRUNK_D;
+    ctx.fillRect(x - 3, y - 16, 6, 16);
+    ctx.fillStyle = TRUNK_M;
+    ctx.fillRect(x - 2, y - 14, 4, 14);
+
+    // Bottom (widest section)
+    ctx.fillStyle = SHADOW;
+    ctx.fillRect(x - 10, y - 28, 20, 14);
+    ctx.fillStyle = DARK;
+    ctx.fillRect(x - 8,  y - 26, 16, 10);
+    ctx.fillStyle = MID;
+    ctx.fillRect(x - 6,  y - 24, 12, 6);
+
+    // Mid-lower
+    ctx.fillStyle = SHADOW;
+    ctx.fillRect(x - 12, y - 52, 24, 26);
+    ctx.fillStyle = DARK;
+    ctx.fillRect(x - 10, y - 50, 20, 22);
+    ctx.fillStyle = MID;
+    ctx.fillRect(x - 8,  y - 48, 16, 18);
+
+    // Mid
+    ctx.fillStyle = SHADOW;
+    ctx.fillRect(x - 10, y - 74, 20, 24);
+    ctx.fillStyle = DARK;
+    ctx.fillRect(x - 8,  y - 72, 16, 20);
+    ctx.fillStyle = MID;
+    ctx.fillRect(x - 6,  y - 70, 12, 16);
+
+    // Upper-mid
+    ctx.fillStyle = SHADOW;
+    ctx.fillRect(x - 8,  y - 92, 16, 20);
+    ctx.fillStyle = DARK;
+    ctx.fillRect(x - 6,  y - 90, 12, 16);
+    ctx.fillStyle = MID;
+    ctx.fillRect(x - 4,  y - 88, 8,  12);
+
+    // Upper
+    ctx.fillStyle = SHADOW;
+    ctx.fillRect(x - 6,  y - 108, 12, 18);
+    ctx.fillStyle = DARK;
+    ctx.fillRect(x - 4,  y - 106, 8,  14);
+    ctx.fillStyle = MID;
+    ctx.fillRect(x - 2,  y - 104, 4,  10);
+
+    // Top
+    ctx.fillStyle = DARK;
+    ctx.fillRect(x - 3, y - 118, 6, 12);
+    ctx.fillStyle = MID;
+    ctx.fillRect(x - 2, y - 116, 4,  8);
+    ctx.fillStyle = HI;
+    ctx.fillRect(x - 1, y - 118, 2,  4);
+
+    // Highlight patches (right edge of each section)
+    ctx.fillStyle = HI;
+    ctx.fillRect(x + 2, y - 112, 4, 6);
+    ctx.fillRect(x + 2, y - 88,  4, 6);
+    ctx.fillRect(x + 2, y - 68,  4, 6);
+    ctx.fillRect(x + 2, y - 48,  4, 6);
+    ctx.fillRect(x + 2, y - 26,  4, 4);
+
     ctx.restore();
   },
 
@@ -1072,13 +1338,13 @@ const Art = {
 
     // Same palette as drawPlayer
     const C = {
-      out: '#331100',
-      cap: '#FF6A00',
+      out: '#081426',
+      cap: '#111111',
       hair: '#803300',
       skin: '#FFB86C',
-      shirt: '#FFE3AF',
+      shirt: '#FFFFFF',
       pants: '#B34700',
-      shoe: '#4A1D00', sole: '#FFCA80',
+      shoe: '#111111', sole: '#FFFFFF',
     };
 
     // Helper to draw blocky pixel shapes with thick borders
@@ -1128,6 +1394,31 @@ const Art = {
     b(hx - 14, hy - 24, 16, 10, C.cap); // Dome
     b(hx - 14 + 14, hy - 18, 12, 4, C.cap);  // Brim
 
+    ctx.restore();
+  },
+
+  drawSkyMissile(ctx, x, y) {
+    // Falling 45° missile — glowing round head with diagonal pixel trail going up-right
+    ctx.save();
+    ctx.imageSmoothingEnabled = false;
+    // Trail: pixels going up-right (opposite of direction of travel)
+    const TRAIL = ['#fff', '#fff', '#ffee88', '#ffcc44', '#ff9900', '#ff6600', '#cc3300', '#882200', '#441100'];
+    for (let i = 0; i < TRAIL.length; i++) {
+      const tx = x + (i + 1) * 4;
+      const ty = y - (i + 1) * 4;
+      const w = Math.max(2, 5 - Math.floor(i * 0.6));
+      ctx.fillStyle = TRAIL[i];
+      ctx.fillRect(Math.round(tx - w / 2), Math.round(ty - w / 2), w, w);
+    }
+    // Glowing head — layered bright pixels
+    ctx.fillStyle = '#cc8800';
+    ctx.fillRect(x - 5, y - 5, 10, 10);
+    ctx.fillStyle = '#ffcc00';
+    ctx.fillRect(x - 4, y - 4, 8, 8);
+    ctx.fillStyle = '#ffee88';
+    ctx.fillRect(x - 2, y - 2, 4, 4);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(x - 1, y - 1, 2, 2);
     ctx.restore();
   },
 
@@ -1344,7 +1635,7 @@ const Art = {
     ctx.fillRect(x + 4, y - 30, kW - 8, 30);
 
     // Shawarma spit pole — centered in the window opening (window x+38..x+116, center x+77)
-    ctx.fillStyle = '#555';
+    ctx.fillStyle = '#bcbea9';
     ctx.fillRect(x + 74, y - kH + 8, 4, 66);  // pole
     ctx.fillStyle = '#000';
     ctx.fillRect(x + 72, y - kH + 6, 8, 4);   // cap
@@ -1400,7 +1691,7 @@ const Art = {
     ctx.font = 'bold 13px monospace';
     ctx.direction = 'rtl';
     ctx.textAlign = 'center';
-    ctx.fillText('שאווארמה פיצוץ', x + doorEnd + signW / 2 + 4, signTop + signH - 5);
+    ctx.fillText('שווארמה פיצוץ', x + doorEnd + signW / 2 + 4, signTop + signH - 5);
     ctx.direction = 'ltr';
     ctx.textAlign = 'left';
 
@@ -1575,10 +1866,9 @@ class Background {
     const objs = [];
     let x = 0;
     while (x < W * 2) {
-      const MID_TYPES = ['palm', 'makolet', 'ficus', 'busstop', 'billboard'];
+      const MID_TYPES = ['oak', 'makolet', 'pine', 'cypress', 'oak', 'pine', 'cypress', 'busstop', 'billboard'];
       const type = MID_TYPES[Math.floor(Math.random() * MID_TYPES.length)];
-      const h = type === 'palm' ? 40 + Math.floor(Math.random() * 30) : 0;
-      objs.push({ x, type, h });
+      objs.push({ x, type });
       x += GAP + Math.floor(Math.random() * 80);
     }
     this.midTileW = x;
@@ -1599,8 +1889,11 @@ class Background {
 
     // ── Night Sky Gradient ───────────────────────────────────────────────────
     const skyGrad = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
-    skyGrad.addColorStop(0, '#081426'); // Dark space blue at the top zenith
-    skyGrad.addColorStop(1, '#1B365D'); // Deep slate blue at horizon
+    skyGrad.addColorStop(0,    '#081426'); // Dark space blue at top zenith
+    skyGrad.addColorStop(0.55, '#1B365D'); // Deep slate blue mid-sky
+    skyGrad.addColorStop(0.78, '#2A2A4A'); // Transitional indigo
+    skyGrad.addColorStop(0.90, '#4A2210'); // Deep ember near horizon
+    skyGrad.addColorStop(1,    '#7A3A0A'); // Warm amber glow at horizon
     ctx.fillStyle = skyGrad;
     ctx.fillRect(0, 0, W, GROUND_Y);
 
@@ -1655,12 +1948,15 @@ class Background {
       if (cx + this.midTileW < 0 || cx > W) continue;
       for (const o of this.midObjects) {
         const ox = cx + o.x;
-        if (o.type === 'palm') {
-          if (ox + 40 < 0 || ox > W) continue;
-          Art.drawPalmTree(ctx, ox, GROUND_Y, o.h);
-        } else if (o.type === 'ficus') {
-          if (ox + 70 < 0 || ox > W) continue;
-          Art.drawFicusTree(ctx, ox, GROUND_Y);
+        if (o.type === 'oak') {
+          if (ox + 100 < 0 || ox > W) continue;
+          Art.drawTreeOak(ctx, ox, GROUND_Y);
+        } else if (o.type === 'pine') {
+          if (ox + 60 < 0 || ox > W) continue;
+          Art.drawTreePine(ctx, ox, GROUND_Y);
+        } else if (o.type === 'cypress') {
+          if (ox + 30 < 0 || ox > W) continue;
+          Art.drawTreeCypress(ctx, ox, GROUND_Y);
         } else if (o.type === 'busstop') {
           if (ox + 75 < 0 || ox > W) continue;
           Art.drawBusStop(ctx, ox, GROUND_Y);
@@ -1787,6 +2083,8 @@ class Obstacle {
 
   update(dt, speed) {
     this.x -= (this.pedAbsSpeed !== undefined ? speed - this.pedAbsSpeed : speed * this.speedFactor) * dt;
+    // Keep the flying pose for cats that have bolted — don't cycle animation frames
+    if (this.ranAway && this.type === 'cat') return;
     this.animTimer += dt;
     if (this.animTimer > 0.12) { this.animTimer = 0; this.animFrame = (this.animFrame + 1) % 4; }
   }
@@ -2060,6 +2358,9 @@ class Game {
     this.ambientTrails = [];
     this.ambientExplosions = [];
     this.ambientMissileTimer = 1.5 + Math.random() * 2;
+    // Sky missiles — last 10 seconds
+    this.skyMissiles = [];
+    this.skyMissileTimer = 0.8 + Math.random() * 0.6;
   }
 
   _completeLevel() {
@@ -2187,6 +2488,15 @@ class Game {
       if (o.type === 'cat' && !o.ranAway && o.x + o.w / 2 < this.player.x - 10) {
         o.ranAway = true;
         o.vy = -260;  // jump upward
+        o.animFrame = 4; // switch to flying pose permanently
+      }
+    }
+    // Cat flying pose: show when player is jumping above the cat
+    for (const o of this.obstacles) {
+      if (o.type === 'cat' && !o.ranAway) {
+        const playerAboveCat = this.player.state === 'jump' &&
+          Math.abs(this.player.x - o.x) < (o.w / 2 + 20);
+        o.animFrame = playerAboveCat ? 4 : (o.animFrame >= 4 ? 0 : o.animFrame);
       }
     }
     for (const o of this.obstacles) {
@@ -2231,6 +2541,24 @@ class Game {
     for (const ex of this.ambientExplosions) ex.t += dt;
     this.ambientTrails = this.ambientTrails.filter(tr => tr.t < tr.duration + 0.1);
     this.ambientExplosions = this.ambientExplosions.filter(ex => ex.t < ex.duration);
+
+    // Sky missiles — spawn in the last 10 seconds, fall 45° from top-right to bottom-left
+    if (this.timeLeft <= 10 && this.timeLeft > 0) {
+      this.skyMissileTimer -= dt;
+      if (this.skyMissileTimer <= 0) {
+        // Start off the top-right edge, travel diagonally down-left across the sky
+        const startX = W * 0.5 + Math.random() * (W * 0.6);
+        const speed = 90 + Math.random() * 60; // px/s
+        this.skyMissiles.push({ x: startX, y: -8, speed });
+        this.skyMissileTimer = 0.6 + Math.random() * 0.8;
+      }
+      for (const m of this.skyMissiles) {
+        m.x -= m.speed * dt;
+        m.y += m.speed * dt;
+      }
+      // Remove once they pass below the building skyline
+      this.skyMissiles = this.skyMissiles.filter(m => m.y < GROUND_Y - 20);
+    }
   }
 
   _draw() {
@@ -2316,13 +2644,18 @@ class Game {
           if (tr.t < tr.duration)
             Art.drawRocketTrail(ctx, tr.x, tr.fromY, tr.toY, tr.t / tr.duration);
         }
+        // Sky missiles drawn behind buildings
+        for (const m of this.skyMissiles) {
+          Art.drawSkyMissile(ctx, Math.round(m.x), Math.round(m.y));
+        }
       });
       // Kiosk scrolls away as a background element after intro
       if (this.kioskVisible) {
         Art.drawShawarmaKioskBack(ctx, this.kioskScreenX, GROUND_Y);
         Art.drawShawarmaKioskFront(ctx, this.kioskScreenX, GROUND_Y);
       }
-      this.obstacles.forEach(o => o.draw(ctx));
+      // Draw non-cat obstacles under the player
+      this.obstacles.forEach(o => { if (o.type !== 'cat') o.draw(ctx); });
       this.shelter.draw(ctx);
       for (const ex of this.ambientExplosions) {
         Art.drawExplosion(ctx, ex.x, ex.y, ex.t / ex.duration);
@@ -2335,6 +2668,8 @@ class Game {
       } else {
         this.player.draw(ctx);
       }
+      // Draw cats above the player so they appear on the highest layer
+      this.obstacles.forEach(o => { if (o.type === 'cat') o.draw(ctx); });
     }
 
     this.particles.draw(ctx);
