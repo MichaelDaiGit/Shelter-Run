@@ -61,38 +61,38 @@ const Art = {
       // ── Baseball Cap ─────────────────────────────────────────────
       // Outer dark outline of dome (drawn slightly larger)
       ctx.fillStyle = C.out;
-      ctx.fillRect(hx + 2, hy - 24, 9,  2);  // top outline
-      ctx.fillRect(hx - 1, hy - 22, 15, 2);  // upper outline
-      ctx.fillRect(hx - 3, hy - 20, 19, 12); // body outline
+      ctx.fillRect(hx + 2, hy - 27, 9,  2);  // top outline
+      ctx.fillRect(hx - 1, hy - 25, 15, 2);  // upper outline
+      ctx.fillRect(hx - 3, hy - 23, 19, 12); // body outline
       // Dome body — staircase for roundness
       ctx.fillStyle = C.cap;
-      ctx.fillRect(hx + 3, hy - 23, 7,  2);  // button top (narrow)
-      ctx.fillRect(hx,     hy - 21, 13, 3);  // narrow upper dome
-      ctx.fillRect(hx - 1, hy - 18, 15, 9);  // main dome body
+      ctx.fillRect(hx + 3, hy - 26, 7,  2);  // button top (narrow)
+      ctx.fillRect(hx,     hy - 24, 13, 3);  // narrow upper dome
+      ctx.fillRect(hx - 1, hy - 21, 15, 9);  // main dome body
       // Center crown seam
       ctx.fillStyle = '#333333';
-      ctx.fillRect(hx + 6, hy - 23, 1, 11);  // seam line
+      ctx.fillRect(hx + 6, hy - 26, 1, 11);  // seam line
       // Sweatband
       ctx.fillStyle = '#222222';
-      ctx.fillRect(hx - 1, hy - 10, 15, 3);
+      ctx.fillRect(hx - 1, hy - 13, 15, 3);
       // ── Logo: white pixel-art semicircle on the front panel ──
       // Arch rows (wider at bottom, narrower at top = upward arch)
       ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(hx + 9, hy - 17, 4, 1); // top arch (2px wide)
-      ctx.fillRect(hx + 8, hy - 16, 6, 1); // mid-upper  
-      ctx.fillRect(hx + 7, hy - 15, 1, 1); ctx.fillRect(hx + 13, hy - 15, 1, 1); // sides
-      ctx.fillRect(hx + 7, hy - 14, 1, 1); ctx.fillRect(hx + 13, hy - 14, 1, 1); // sides lower
+      ctx.fillRect(hx + 9, hy - 20, 4, 1); // top arch (2px wide)
+      ctx.fillRect(hx + 8, hy - 19, 6, 1); // mid-upper
+      ctx.fillRect(hx + 7, hy - 18, 1, 1); ctx.fillRect(hx + 13, hy - 18, 1, 1); // sides
+      ctx.fillRect(hx + 7, hy - 17, 1, 1); ctx.fillRect(hx + 13, hy - 17, 1, 1); // sides lower
       // Brim — main body
       ctx.fillStyle = C.out;
-      ctx.fillRect(hx + 13, hy - 12, 16, 5); // brim outline
+      ctx.fillRect(hx + 13, hy - 15, 16, 5); // brim outline
       ctx.fillStyle = C.cap;
-      ctx.fillRect(hx + 13, hy - 11, 14, 3); // brim top surface
+      ctx.fillRect(hx + 13, hy - 14, 14, 3); // brim top surface
       // Brim tip slopes down
       ctx.fillStyle = C.cap;
-      ctx.fillRect(hx + 24, hy - 10, 3, 2);
+      ctx.fillRect(hx + 24, hy - 13, 3, 2);
       // Brim underside shadow
       ctx.fillStyle = '#333333';
-      ctx.fillRect(hx + 13, hy - 8, 14, 2);
+      ctx.fillRect(hx + 13, hy - 11, 14, 2);
     };
 
     if (state === 'duck') {
@@ -131,6 +131,77 @@ const Art = {
       ctx.fillStyle = C.out; ctx.fillRect(14, -56, 2, 4); // Finger indent top
 
       drawHead(-6, -52);
+
+    } else if (state === 'forward') {
+      // ── FORWARD STATE (facing camera, walking in place) ───────────────────
+
+      // Alternating foot lift: left up on frames 0-1, right up on frames 2-3
+      const lLift = [0, -2, -4, -2][frame % 4];  // left foot y offset (negative = lifted)
+      const rLift = [-4, -2, 0, -2][frame % 4];  // right foot y offset
+      const bob   = [0, -1, 0, -1][frame % 4];   // body bob
+
+      ctx.save();
+      ctx.translate(0, bob);
+
+      // Left leg
+      b(-12, -28,        10, 14, C.pants);
+      b(-10, -16 + lLift, 8, 12, C.pants);
+      b(-13,  -6 + lLift,12,  6, C.shoe);
+      b(-13,   0 + lLift,12,  2, C.sole, false);
+
+      // Right leg
+      b(  3, -28,        10, 14, C.pants);
+      b(  3, -16 + rLift, 8, 12, C.pants);
+      b(  2,  -6 + rLift,12,  6, C.shoe);
+      b(  2,   0 + rLift,12,  2, C.sole, false);
+
+      // Torso
+      b(-9, -52, 18, 26, C.shirt);
+
+      // Left arm (hanging)
+      b(-17, -50, 8, 12, C.shirt);
+      b(-18, -38, 8,  8, C.skin);
+
+      // Right arm (hanging)
+      b( 9, -50, 8, 12, C.shirt);
+      b(10, -38, 8,  8, C.skin);
+
+      // Cap dome — rounded top (3-step staircase pixel art)
+      ctx.fillStyle = C.out;
+      ctx.fillRect( -8, -82, 16,  2);  // top row: narrow (corners cut)
+      ctx.fillRect(-10, -80, 20,  2);  // second row: slightly wider
+      ctx.fillRect(-11, -78, 22, 14);  // body: full width
+      ctx.fillStyle = C.cap;
+      ctx.fillRect( -6, -80, 12,  2);  // top fill (narrowest)
+      ctx.fillRect( -8, -78, 16,  2);  // second fill row
+      ctx.fillRect( -9, -76, 18, 10);  // body fill (y: -76 to -66)
+      ctx.fillStyle = '#333333';
+      ctx.fillRect( -1, -80,  2, 12);  // center seam
+
+      // Face (front-facing)
+      b(-8, -66, 16, 14, C.skin);
+
+      // Brim (front-view visor, drawn over forehead area)
+      ctx.fillStyle = C.out;
+      ctx.fillRect(-14, -70, 28,  6);
+      ctx.fillStyle = C.cap;
+      ctx.fillRect(-12, -69, 24,  4);
+      ctx.fillStyle = '#333333';
+      ctx.fillRect(-12, -65, 24,  2);  // underside shadow
+
+      // Eyes (two, symmetric)
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(-6, -62, 4, 4);     // left sclera
+      ctx.fillRect( 2, -62, 4, 4);     // right sclera
+      ctx.fillStyle = C.out;
+      ctx.fillRect(-5, -61, 2, 3);     // left pupil
+      ctx.fillRect( 3, -61, 2, 3);     // right pupil
+
+      // Beard / jaw
+      ctx.fillStyle = C.hair;
+      ctx.fillRect(-8, -58, 16, 6);
+
+      ctx.restore();
 
     } else {
       // ── RUN STATE ─────────────────────────────────────────────────────────────
@@ -1890,12 +1961,31 @@ class Background {
     // ── Night Sky Gradient ───────────────────────────────────────────────────
     const skyGrad = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
     skyGrad.addColorStop(0,    '#081426'); // Dark space blue at top zenith
-    skyGrad.addColorStop(0.55, '#1B365D'); // Deep slate blue mid-sky
-    skyGrad.addColorStop(0.78, '#2A2A4A'); // Transitional indigo
-    skyGrad.addColorStop(0.90, '#4A2210'); // Deep ember near horizon
-    skyGrad.addColorStop(1,    '#7A3A0A'); // Warm amber glow at horizon
+    skyGrad.addColorStop(0.38, '#1B365D'); // Deep slate blue (pulled up)
+    skyGrad.addColorStop(0.56, '#2A2A4A'); // Transitional indigo (pulled up)
+    skyGrad.addColorStop(0.70, '#4A2210'); // Deep ember (pulled up)
+    skyGrad.addColorStop(0.86, '#7A3A0A'); // Warm amber
+    skyGrad.addColorStop(1,    '#A04808'); // Hot orange at horizon
     ctx.fillStyle = skyGrad;
     ctx.fillRect(0, 0, W, GROUND_Y);
+
+    // ── Halftone texture overlay ──────────────────────────────────────────────
+    // Two-pass staggered grid: fine cool dots top, coarser warm dots bottom
+    const HT = 4;
+    for (let gy = 0; gy < GROUND_Y; gy += HT) {
+      const t = gy / GROUND_Y;
+      // Dot size: 1px in upper sky → 2px past mid → 3px near horizon
+      const dotSize = t > 0.72 ? 3 : t > 0.44 ? 2 : 1;
+      // Strong coverage throughout: 0.28 at zenith, up to 0.70 at horizon
+      ctx.globalAlpha = 0.28 + t * 0.42;
+      // Cool blue dots upper sky; warm dark-amber below (transition pulled up)
+      ctx.fillStyle = t > 0.44 ? '#200C02' : '#1A3558';
+      const xOff = (Math.floor(gy / HT) % 2) * (HT / 2);
+      for (let gx = xOff; gx < W; gx += HT) {
+        ctx.fillRect(gx, gy, dotSize, dotSize);
+      }
+    }
+    ctx.globalAlpha = 1.0;
 
     // ── Procedural Stars ─────────────────────────────────────────────────────
     ctx.fillStyle = '#2A4B75'; // Faint slate stars to keep the sky clean
@@ -2345,8 +2435,8 @@ class Game {
     this.obstacles = [];
     this.shelter = new ShelterDoor();
     this.player.reset();
-    this.kioskScreenX = Math.round(W / 2) - 84;  // kiosk centered on screen (kW/2=84)
-    this.player.x = this.kioskScreenX + 55;      // player starts inside (right of door)
+    this.kioskScreenX = PLAYER_X - 10;            // door opening at x=70, player in middle of door at 80
+    this.player.x = PLAYER_X;                    // player stands still in doorway throughout zoom
     this.introZoom = 2.0;                         // zoom starts at 200%, pulls back to 100%
     this.kioskVisible = true;
     this.distanceToShelter = Math.ceil(def.time * this.speed / 40);
@@ -2400,16 +2490,13 @@ class Game {
   }
 
   _updatePlaying(dt) {
-    // ── Phase 0: Level intro — zoom out + player exits kiosk left toward PLAYER_X ──
+    // ── Phase 0: Level intro — zoom out 2x→1x, player walks in kiosk doorway ──
     if (this.levelIntro) {
-      // Zoom 2x → 1x over ~2s (cinematic pull-back)
       this.introZoom = Math.max(1, this.introZoom - 0.5 * dt);
-      // Player walks left out through the left-side door
-      this.player.update(dt);
-      this.player.state = 'run';
-      this.player.x -= 140 * dt;
-      if (this.player.x <= PLAYER_X && this.introZoom <= 1) {
-        this.player.x = PLAYER_X;
+      this.player.state = 'forward';  // face the camera while in doorway
+      this.player.update(dt);        // tick animFrame for walking animation
+      if (this.introZoom <= 1) {
+        this.player.state = 'run';
         this.levelIntro = false;
       }
       return;
@@ -2626,17 +2713,16 @@ class Game {
     if (this.levelIntro) {
       // Zoom entire scene (background + midground + kiosk + player) 2x → 1x
       const zoom = this.introZoom;
-      const zCX = this.kioskScreenX + 84;  // kiosk center x (kW/2)
+      const zCX = PLAYER_X;  // zoom centered on player (stays at screen x=80 at any zoom level)
       const zCY = GROUND_Y - 50;           // kiosk center y
       ctx.save();
       ctx.translate(zCX, zCY);
       ctx.scale(zoom, zoom);
       ctx.translate(-zCX, -zCY);
       this.background.draw(ctx);
-      // 2-pass: back wall → player → front wall (depth illusion as player exits door)
       Art.drawShawarmaKioskBack(ctx, this.kioskScreenX, GROUND_Y);
-      this.player.draw(ctx);
       Art.drawShawarmaKioskFront(ctx, this.kioskScreenX, GROUND_Y);
+      this.player.draw(ctx);  // player on top of kiosk
       ctx.restore();
     } else {
       this.background.draw(ctx, () => {
